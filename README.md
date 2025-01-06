@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-# EasyBank
-=======
 # 📘 Projet : EasyBank
 ## 📝 Contexte
 Vous allez développer une petite application PHP orientée objet (OOP) qui permet de gérer des comptes bancaires. Les utilisateurs (clients) pourront consulter leur solde, effectuer des dépôts, retraits, et transferts d’argent.
@@ -151,4 +148,3 @@ project/
 
 ---
 
->>>>>>> 93b72112a31b6637ceb46e9e9e0179ca77fe68f0
