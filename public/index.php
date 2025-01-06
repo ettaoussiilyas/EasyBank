@@ -2,17 +2,20 @@
 
     require_once '../app/config/db.php';
     require_once ('../core/BaseController.php');
+    require_once ('../app/controllers/AuthController.php');
     require_once '../core/Router.php';
     require_once '../core/Route.php';
 
 
+    session_start();
 
     $router = new Router();
     Route::setRouter($router);
 
 
     //Auth Routes
-    Route::get('/register', [AuthController::class, 'showRegister']);
+    Route::get('/', [AuthController::class, 'showHome']);
+    Route::get('', [AuthController::class, 'showHome']);
 
 
 
