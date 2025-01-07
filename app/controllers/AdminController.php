@@ -47,5 +47,9 @@ class AdminController extends BaseController {
         $this->accounts();
     }
 
-    
+    public function deleteAccount() {
+        $account_id = $_POST['account_id'];
+        $this->accountsModel->deleteAccount($account_id);
+        $this->accounts();
+    }
 }

@@ -54,5 +54,10 @@ class Accounts extends Db
         
     }
 
-    
+    public function deleteAccount($id){
+        $sql = "DELETE FROM accounts WHERE id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $params = [$id];
+        return $stmt->execute($params);
+    }
 }
