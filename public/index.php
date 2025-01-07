@@ -1,5 +1,8 @@
 <?php
 
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
     require_once '../app/config/db.php';
     require_once ('../core/BaseController.php');
     require_once '../core/Router.php';
@@ -12,7 +15,7 @@
 
 
     //Auth Routes
-    Route::get('/register', [AuthController::class, 'showRegister']);
+    // Route::get('/register', [AuthController::class, 'showRegister']);
 
 
 
