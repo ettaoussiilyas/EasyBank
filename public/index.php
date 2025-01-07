@@ -13,9 +13,17 @@
     Route::setRouter($router);
 
     //Auth Routes
+    //home handling
     Route::get('/', [AuthController::class, 'showHome']);
     Route::get('/home', [AuthController::class, 'showHome']);
     Route::get('', [AuthController::class, 'showHome']);
+    //hadling login
+    Route::get('/login', [AuthController::class, 'showLogin']);
+    Route::post('/login', [AuthController::class, 'loginChecker']);
+    //handling register
+    Route::get('/register', [AuthController::class, 'showRegister']);
+    Route::post('/register', [AuthController::class, 'registerChecker']);
+
 
 
 
