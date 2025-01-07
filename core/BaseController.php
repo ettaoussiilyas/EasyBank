@@ -20,23 +20,21 @@ class BaseController
     {
         if (file_exists(__DIR__ . "/../app/views/{$view}.php")) {
             extract($data);
-            require_once(__DIR__ . "/../app/views/{$view}.php");
-        } else {
+            include_once __DIR__.'/../app/views/'.$view.'.php';
+        }else{
             throw new Exception("Vue non trouvée: {$view}");
         }
     }
 
-    public function renderAdmin($view, $data = [])
-    {
-
-        extract($data);
-        include_once __DIR__ . '/../app/views/admin/' . $view . '.php';
+        public function renderAdmin($view, $data = []){
+            
+            extract($data);
+            include_once __DIR__.'/../app/views/admin/'.$view.'.php';
+        }
+        
+        public function renderClient($view, $data = []){
+            
+            extract($data);
+            include_once __DIR__.'/../app/views/client/'.$view.'.php';
+        }
     }
-
-    public function renderClient($view, $data = [])
-    {
-
-        extract($data);
-        include_once __DIR__ . '/../app/views/client/' . $view . '.php';
-    }
-}

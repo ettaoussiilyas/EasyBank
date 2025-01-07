@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__.'./Router.php');
+require_once(__DIR__.'/Router.php');
 $router = new Router();
 class Route
 {
@@ -18,7 +18,7 @@ class Route
      */
     public static function get($route, $callback)
     {
-        self::addRoute('GET', $route, $callback);
+        self::addRoute('GET', $route, $callback); 
     }
 
     /**
