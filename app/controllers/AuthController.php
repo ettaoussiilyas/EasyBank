@@ -46,16 +46,24 @@
                     return $this->render('auth/login', ['notFoundError' => 'User not found']);
                 }
 
-                // if(!password_verify($password, $user['password'])){
-                if($password !== $user['password']){
+                   
+                
+                if(!password_verify($password, $user['password'])){
                     $this->render('auth/login', ['invalidPasswordError' => 'Invalid password']);
                 }
 
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_name'] = $user['name'];
                 $_SESSION['profile_pic'] = $user['profile_pic'];
-                header('Location: /home');
-                exit;
+
+                $id= int($user['id']);
+                if($user['id']==1){
+                    header('Location: /home');
+                    exit;
+                }else{
+                    header('Location: /client/profile/');
+                    exit;
+                }
             }
             
             $this->render('auth/login');
