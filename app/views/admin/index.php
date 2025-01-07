@@ -21,8 +21,7 @@ require_once(__DIR__ . '/../partials/sidebar.php');
                     </div>
                     <div class="ml-4">
                         <h3 class="text-gray-500 text-sm">Total Clients</h3>
-                        <p class="text-2xl font-bold text-gray-800">1,482</p>
-                        <p class="text-sm text-green-500">+12% ce mois</p>
+                        <p class="text-2xl font-bold text-gray-800"><?= number_format($data['totalClients']) ?></p>
                     </div>
                 </div>
             </div>
@@ -37,8 +36,7 @@ require_once(__DIR__ . '/../partials/sidebar.php');
                     </div>
                     <div class="ml-4">
                         <h3 class="text-gray-500 text-sm">Comptes Actifs</h3>
-                        <p class="text-2xl font-bold text-gray-800">3,274</p>
-                        <p class="text-sm text-green-500">+8% ce mois</p>
+                        <p class="text-2xl font-bold text-gray-800"><?= number_format($data['activeAccounts']) ?></p>
                     </div>
                 </div>
             </div>
@@ -53,8 +51,7 @@ require_once(__DIR__ . '/../partials/sidebar.php');
                     </div>
                     <div class="ml-4">
                         <h3 class="text-gray-500 text-sm">Transactions</h3>
-                        <p class="text-2xl font-bold text-gray-800">12,821</p>
-                        <p class="text-sm text-blue-500">+23% ce mois</p>
+                        <p class="text-2xl font-bold text-gray-800"><?= number_format($data['totalTransactions']) ?></p>
                     </div>
                 </div>
             </div>
@@ -69,8 +66,7 @@ require_once(__DIR__ . '/../partials/sidebar.php');
                     </div>
                     <div class="ml-4">
                         <h3 class="text-gray-500 text-sm">Solde Total</h3>
-                        <p class="text-2xl font-bold text-gray-800">275,000 €</p>
-                        <p class="text-sm text-green-500">+7% ce mois</p>
+                        <p class="text-2xl font-bold text-gray-800"><?= number_format($data['totalBalance'], 2) ?> €</p>
                     </div>
                 </div>
             </div>
@@ -85,27 +81,17 @@ require_once(__DIR__ . '/../partials/sidebar.php');
                 </div>
                 <div class="p-4">
                     <div class="space-y-4">
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <p class="font-semibold">Dépôt - Jean Dupont</p>
-                                <p class="text-sm text-gray-500">Il y a 2 heures</p>
+                        <?php foreach($data['latestTransactions'] as $transaction): ?>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="font-semibold"><?= htmlspecialchars($transaction['transaction_type']) ?> - <?= htmlspecialchars($transaction['client_name']) ?></p>
+                                    <p class="text-sm text-gray-500"><?= $transaction['formatted_date'] ?></p>
+                                </div>
+                                <span class="<?= $transaction['transaction_type'] == 'depot' ? 'text-green-600' : 'text-red-600' ?> font-semibold">
+                                    <?= $transaction['transaction_type'] == 'depot' ? '+' : '-' ?><?= number_format($transaction['amount'], 2) ?> €
+                                </span>
                             </div>
-                            <span class="text-green-600 font-semibold">+1,500 €</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <p class="font-semibold">Retrait - Marie Martin</p>
-                                <p class="text-sm text-gray-500">Il y a 3 heures</p>
-                            </div>
-                            <span class="text-red-600 font-semibold">-500 €</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <p class="font-semibold">Transfert - Pierre Durand</p>
-                                <p class="text-sm text-gray-500">Il y a 5 heures</p>
-                            </div>
-                            <span class="text-violet-600 font-semibold">2,000 €</span>
-                        </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
             </div>
@@ -117,36 +103,18 @@ require_once(__DIR__ . '/../partials/sidebar.php');
                 </div>
                 <div class="p-4">
                     <div class="space-y-4">
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                <span class="text-gray-600 font-semibold">JD</span>
+                        <?php foreach($data['newAccounts'] as $account): ?>
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+                                    <span class="text-gray-600 font-semibold"><?= substr($account['client_name'], 0, 2) ?></span>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="font-semibold"><?= htmlspecialchars($account['client_name']) ?></p>
+                                    <p class="text-sm text-gray-500">Compte <?= $account['account_type'] ?></p>
+                                </div>
+                                <span class="ml-auto text-green-600">Actif</span>
                             </div>
-                            <div class="ml-4">
-                                <p class="font-semibold">Jean Dupont</p>
-                                <p class="text-sm text-gray-500">Compte Courant</p>
-                            </div>
-                            <span class="ml-auto text-green-600">Actif</span>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                <span class="text-gray-600 font-semibold">MM</span>
-                            </div>
-                            <div class="ml-4">
-                                <p class="font-semibold">Marie Martin</p>
-                                <p class="text-sm text-gray-500">Compte Épargne</p>
-                            </div>
-                            <span class="ml-auto text-green-600">Actif</span>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                <span class="text-gray-600 font-semibold">PD</span>
-                            </div>
-                            <div class="ml-4">
-                                <p class="font-semibold">Pierre Durand</p>
-                                <p class="text-sm text-gray-500">Compte Courant</p>
-                            </div>
-                            <span class="ml-auto text-green-600">Actif</span>
-                        </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
             </div>

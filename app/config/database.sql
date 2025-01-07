@@ -66,4 +66,8 @@ INSERT INTO transactions (account_id, transaction_type, amount, beneficiary_acco
 -- Transferts
 (1, 'transfert', 300.00, 3),
 (2, 'transfert', 500.00, 4),
-(3, 'transfert', 250.00, 5); 
+(3, 'transfert', 250.00, 5);
+
+-- Ajout de l'administrateur
+INSERT INTO users (id, name, email, password) VALUES 
+(1, 'admin', 'admin@gmail.com', '$2y$10$abcdef123456789'); 

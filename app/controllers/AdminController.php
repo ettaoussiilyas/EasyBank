@@ -1,18 +1,22 @@
 <?php
-require_once(__DIR__ . '/../models/Accounts.php');
+require_once(__DIR__ . '/../models/Statistics.php');
 
+class AdminController extends BaseController {
+    private $statsModel;
 
-class AdminController extends BaseController
-{
-    private $AccountsModel;
-
-    public function __construct()
-    {
-        $this->AccountsModel = new Accounts();
+    public function __construct() {
+        $this->statsModel = new Statistics();
     }
-    public function index()
-    {
-        $accounts = $this->AccountsModel->getAllAccounts();
-        $this->renderAdmin('index', ["" => $accounts]);
+
+    public function index() {
+        $statistics = $this->statsModel->getStatistics();
+        $this->renderAdmin('index', [
+            'totalClients' => $statistics['totalClients'],
+            'activeAccounts' => $statistics['activeAccounts'],
+            'totalTransactions' => $statistics['totalTransactions'],
+            'totalBalance' => $statistics['totalBalance'],
+            'latestTransactions' => $statistics['latestTransactions'],
+            'newAccounts' => $statistics['newAccounts']
+        ]);
     }
 }

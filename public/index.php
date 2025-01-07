@@ -19,6 +19,7 @@ $route = new Route();
 //Auth Routes
 // Route::get('/register', [AuthController::class, 'showRegister']);
 $route::get('/admin', [AdminController::class, 'index']);
+$route::get('/admin/accounts', [AdminController::class, 'accounts']);
 
 
 
