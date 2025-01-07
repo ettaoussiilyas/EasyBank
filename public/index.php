@@ -7,6 +7,7 @@
     require_once '../core/Route.php';
     require_once '../app/controllers/AuthController.php';
     require_once '../app/controllers/AdminController.php';
+    require_once '../app/controllers/UserController.php';
 
 
     session_start();
@@ -31,6 +32,20 @@
     // Route::get('/register', [AuthController::class, 'showRegister']);
     $route::get('/admin', [AdminController::class, 'index']);
     $route::get('/admin/accounts', [AdminController::class, 'accounts']);
+
+
+    //user Routers
+    Route::get('/user/profile', [UserController::class, 'profile']);
+    Route::get('/user/account', [UserController::class, 'showAccount']);
+    // Route::post('/user/profile', [UserController::class, 'updateProfile']);
+    Route::get('/user/transactions', [UserController::class, 'transactions']);
+    // Route::post('/user/transactions', [UserController::class, 'transactionChecker']);
+    Route::get('/user/transfer', [UserController::class, 'transfer']);
+    // Route::post('/user/transfer', [UserController::class, 'transferChecker']);
+    Route::get('/user/withdraw', [UserController::class, 'withdraw']);
+    // Route::post('/user/withdraw', [UserController::class, 'withdrawChecker']);
+    Route::get('/user/deposit', [UserController::class, 'deposit']);
+    // Route::post('/user/deposit', [UserController::class, 'depositChecker']);
 
 
 

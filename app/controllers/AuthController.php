@@ -52,14 +52,15 @@
 
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_name'] = $user['name'];
-                $_SESSION['profile_pic'] = $user['profile_pic'];
+                $_SESSION['user_profile_pic'] = $user['profile_pic'];
+                $_SESSION['user_email'] = $user['email'  ];
 
                 $id= (int)$user['id'];
                 if($user['id']==1){
                     header('Location: /admin');
                     exit;
                 }else{
-                    header('Location: /client/profile/');
+                    header('Location: /user/profile');
                     exit;
                 }
             }

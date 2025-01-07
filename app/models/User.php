@@ -21,6 +21,13 @@
             $result = $stmt->execute([$user['name'], $user['email'], $user['password']]);
             return $result;
         }
+
+        public function updateUser($data){
+            $stmt = $this->conn->prepare("UPDATE users SET name =?, email =?, password =?, profile_pic=? WHERE id =?");
+            $result = $stmt->execute([$data['name'], $data['email'], $data['password'],$data['picture'], $data['id']]);
+            return $result;
+
+        }
     }
 
 
