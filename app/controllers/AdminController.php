@@ -28,4 +28,6 @@ class AdminController extends BaseController {
         $accounts = $this->accountsModel->getAllAccounts();
         $this->renderAdmin('accounts', ["accounts" => $accounts]);
     }
+
+    
 }

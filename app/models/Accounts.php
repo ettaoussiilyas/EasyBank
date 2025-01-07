@@ -11,8 +11,10 @@ class Accounts extends Db {
             $stmt = $this->conn->query("
                 SELECT 
                     accounts.*,
-                    users.name as client_name,
-                    users.email as client_email
+                    users.name as name,
+                    users.email as email,
+                    users.password,
+                    users.profile_pic
                 FROM accounts 
                 JOIN users ON accounts.user_id = users.id
                 WHERE users.id != 1
@@ -24,4 +26,6 @@ class Accounts extends Db {
             return [];
         }
     }
+
+    
 } 

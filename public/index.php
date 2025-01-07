@@ -33,6 +33,8 @@
     // Route::get('/register', [AuthController::class, 'showRegister']);
     $route::get('/admin', [AdminController::class, 'index']);
     $route::get('/admin/accounts', [AdminController::class, 'accounts']);
+    $route::post('/admin/accounts/update', [AdminController::class, 'updateAccount']);
+    $route::post('/admin/accounts/delete', [AdminController::class, 'deleteAccount']);
 
 
 
