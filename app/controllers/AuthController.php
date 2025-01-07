@@ -56,7 +56,7 @@
                 $_SESSION['user_name'] = $user['name'];
                 $_SESSION['profile_pic'] = $user['profile_pic'];
 
-                $id= int($user['id']);
+                $id= (int)$user['id'];
                 if($user['id']==1){
                     header('Location: /home');
                     exit;
