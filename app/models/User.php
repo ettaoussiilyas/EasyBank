@@ -14,6 +14,13 @@
             $stmt->execute(['email' => $email]);
             return $stmt->fetch();
         }
+
+        public function insertUser($user){
+
+            $stmt = $this->conn->prepare("INSERT INTO users(name,email,password) values (?,?,?)");
+            $result = $stmt->execute([$user['name'], $user['email'], $user['password']]);
+            return $result;
+        }
     }
 
 

@@ -22,9 +22,7 @@
     //hadling login
     Route::get('/login', [AuthController::class, 'showLogin']);
     Route::post('/login', [AuthController::class, 'loginChecker']);
-    //handling register
-    Route::get('/register', [AuthController::class, 'showRegister']);
-    Route::post('/register', [AuthController::class, 'registerChecker']);
+
 
     // Créer une instance de Route
     $route = new Route();

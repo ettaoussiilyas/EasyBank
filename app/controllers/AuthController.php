@@ -26,10 +26,8 @@
             $this->render('auth/login');
         }
 
-        //showing register page
-        public function showRegister(){
-            $this->render('auth/register');
-        }
+
+
 
         public function loginChecker(){
             if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])){
@@ -58,7 +56,7 @@
 
                 $id= (int)$user['id'];
                 if($user['id']==1){
-                    header('Location: /home');
+                    header('Location: /admin');
                     exit;
                 }else{
                     header('Location: /client/profile/');
@@ -67,10 +65,6 @@
             }
             
             $this->render('auth/login');
-        }
-
-        public function registerChecker(){
-            $this->render('auth/register');
         }
 
     }
