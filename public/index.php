@@ -1,10 +1,12 @@
 <?php
 
+
     require_once '../app/config/db.php';
-    require_once ('../core/BaseController.php');
-    require_once ('../app/controllers/AuthController.php');
+    require_once('../core/BaseController.php');
     require_once '../core/Router.php';
     require_once '../core/Route.php';
+    require_once '../app/controllers/AuthController.php';
+    require_once '../app/controllers/AdminController.php';
 
 
     session_start();
@@ -24,9 +26,14 @@
     Route::get('/register', [AuthController::class, 'showRegister']);
     Route::post('/register', [AuthController::class, 'registerChecker']);
 
+    // Créer une instance de Route
+    $route = new Route();
+
+    //Auth Routes
+    // Route::get('/register', [AuthController::class, 'showRegister']);
+    $route::get('/admin', [AdminController::class, 'index']);
+    $route::get('/admin/accounts', [AdminController::class, 'accounts']);
 
 
 
     $router->dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
-
-?>
