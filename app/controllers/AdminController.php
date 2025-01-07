@@ -29,5 +29,23 @@ class AdminController extends BaseController {
         $this->renderAdmin('accounts', ["accounts" => $accounts]);
     }
 
+    public function updateAccount() {
+        $account_id = $_POST['account_id'];
+        $account_type = $_POST['account_type'];
+        $balance = $_POST['balance'];
+        $name = $_POST['name'];
+        $email = $_POST['email'];
+        
+        $this->accountsModel->updateAccount(
+            $account_id,
+            $account_type,
+            $balance,
+            $name,
+            $email
+        );
+        
+        $this->accounts();
+    }
+
     
 }

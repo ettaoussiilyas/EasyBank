@@ -1,13 +1,16 @@
 <?php
 require_once(__DIR__ . '/../config/db.php');
-class Accounts extends Db {
-    
-    public function __construct() {
+class Accounts extends Db
+{
+
+    public function __construct()
+    {
         parent::__construct();
     }
 
-    public function getAllAccounts() {
-        try {
+    public function getAllAccounts()
+    {
+       
             $stmt = $this->conn->query("
                 SELECT 
                     accounts.*,
@@ -21,11 +24,35 @@ class Accounts extends Db {
                 ORDER BY accounts.created_at DESC
             ");
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch(PDOException $e) {
-            error_log($e->getMessage());
-            return [];
-        }
+        
+    }
+
+    public function updateAccount($id, $account_type, $balance, $name, $email)
+    {
+        
+            $sql = "UPDATE accounts a
+                    JOIN users u ON a.user_id = u.id
+                    SET 
+                        a.account_type = ?,
+                        a.balance = ?,
+                        u.name = ?,
+                        u.email = ?";
+
+            $sql .= " WHERE a.id = ?";
+
+            $stmt = $this->conn->prepare($sql);
+
+            $params = [
+                $account_type,
+                $balance,
+                $name,
+                $email,
+                $id
+            ];
+
+            return $stmt->execute($params);
+        
     }
 
     
-} 
+}
