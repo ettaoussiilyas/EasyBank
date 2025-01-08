@@ -54,6 +54,9 @@
                 $_SESSION['user_name'] = $user['name'];
                 $_SESSION['user_profile_pic'] = $user['profile_pic'];
                 $_SESSION['user_email'] = $user['email'  ];
+                
+                $status = $this->userModel->getStatus($user['id']);
+                $_SESSION['status'] = $status;
 
                 $id= (int)$user['id'];
                 if($user['id']==1){

@@ -28,6 +28,14 @@
             return $result;
 
         }
+
+        public function getStatus($id){
+
+            $stmt = $this->conn->prepare("SELECT status FROM accounts WHERE id =?");
+            $stmt->execute([$id]);
+            return $stmt->fetch()['status'];
+            
+        }
     }
 
 
