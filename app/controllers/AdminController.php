@@ -1,18 +1,19 @@
 <?php
 require_once(__DIR__ . '/../models/Statistics.php');
 require_once(__DIR__ . '/../models/Accounts.php');
+require_once(__DIR__ . '/../models/Users.php');
 
 
 
 class AdminController extends BaseController {
     private $statsModel;
     private $accountsModel;
-    private $userModel;
+    private $usersModel;
 
     public function __construct() {
         $this->statsModel = new Statistics();
         $this->accountsModel = new Accounts();
-        $this->userModel = new User();
+        $this->usersModel = new User();
     }
 
     public function index() {
@@ -43,10 +44,6 @@ class AdminController extends BaseController {
             $errors[] = "Invalid account type";
         }
         
-        if (!isset($_POST['balance']) || !is_numeric($_POST['balance']) || $_POST['balance'] < 0) {
-            $errors[] = "Invalid balance amount";
-        }
-        
         if (empty($_POST['status']) || !in_array($_POST['status'], ['active', 'inactive'])) {
             $errors[] = "Invalid status";
         }
@@ -60,7 +57,6 @@ class AdminController extends BaseController {
         $this->accountsModel->updateAccount(
             $_POST['account_id'],
             $_POST['account_type'],
-            $_POST['balance'],
             $_POST['status']
         );
         
@@ -95,8 +91,54 @@ class AdminController extends BaseController {
     }
 
     public function users() {
-        $users = $this->userModel->getAllUsers();
-        $this->renderAdmin('users', ["users" => $users]); 
+        $users = $this->usersModel->getAllUsers();
+        $this->renderAdmin('users', ["users" => $users]);
+    }
+
+    public function createUser() {
+        $errors = [];
+        
+        if (empty($_POST['name']) || strlen($_POST['name']) < 2) {
+            $errors[] = "Name must be at least 2 characters long";
+        }
+        
+        if (empty($_POST['email']) || !filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+            $errors[] = "Invalid email address";
+        }
+        
+        if (!empty($_POST['profile_pic']) && !filter_var($_POST['profile_pic'], FILTER_VALIDATE_URL)) {
+            $errors[] = "Invalid profile picture URL";
+        }
+        
+        if (!empty($errors)) {
+            $_SESSION['errors'] = $errors;
+            $this->users();
+            exit;
+        }
+        
+        try {
+            $result = $this->usersModel->createUser(
+                $_POST['name'],
+                $_POST['email'],
+                $_POST['profile_pic'] ?? null
+            );
+            
+            if ($result['success']) {
+                $_SESSION['success'] = "User created successfully. Generated password: " . $result['password'];
+            } else {
+                $_SESSION['errors'] = ["Failed to create user"];
+            }
+            
+        } catch (PDOException $e) {
+            if ($e->getCode() == 23000) {
+                $_SESSION['errors'] = ["This email address is already in use"];
+            } else {
+                $_SESSION['errors'] = ["An error occurred while creating the user"];
+            }
+        }
+        
+        $this->users();
+        exit;
     }
 
 }

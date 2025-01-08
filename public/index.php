@@ -37,10 +37,9 @@
     $route::post('/admin/accounts/delete', [AdminController::class, 'deleteAccount']);
     $route::post('/admin/accounts/toggle-status', [AdminController::class, 'toggleStatus']);
     $route::get('/admin/accounts/search', [AdminController::class, 'searchAccounts']);
+    $route::post('/admin/users/create', [AdminController::class, 'createUser']);
     $route::get('/admin/users', [AdminController::class, 'users']);
-
-  
-
+    $route::post('//admin/users/update', [AdminController::class, 'UpdatUser']);
 
 
     $router->dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);

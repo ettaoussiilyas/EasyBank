@@ -25,11 +25,10 @@ class Accounts extends Db {
         
     }
 
-    public function updateAccount($id, $account_type, $balance, $status) {
+    public function updateAccount($id, $account_type, $status) {
         $sql = "UPDATE accounts 
                 SET 
                     account_type = ?,
-                    balance = ?,
                     status = ?
                 WHERE id = ?";
         
@@ -37,7 +36,6 @@ class Accounts extends Db {
         
         $params = [
             $account_type,
-            $balance,
             $status,
             $id
         ];
