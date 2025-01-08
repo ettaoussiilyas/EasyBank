@@ -30,16 +30,35 @@ class AdminController extends BaseController {
     }
 
     public function updateAccount() {
-        $account_id = $_POST['account_id'];
-        $account_type = $_POST['account_type'];
-        $balance = $_POST['balance'];
-        $status = $_POST['status'];
+        $errors = [];
+        
+        if (empty($_POST['account_id']) || !is_numeric($_POST['account_id'])) {
+            $errors[] = "Invalid account ID";
+        }
+        
+        if (empty($_POST['account_type']) || !in_array($_POST['account_type'], ['courant', 'epargne'])) {
+            $errors[] = "Invalid account type";
+        }
+        
+        if (!isset($_POST['balance']) || !is_numeric($_POST['balance']) || $_POST['balance'] < 0) {
+            $errors[] = "Invalid balance amount";
+        }
+        
+        if (empty($_POST['status']) || !in_array($_POST['status'], ['active', 'inactive'])) {
+            $errors[] = "Invalid status";
+        }
+        
+        if (!empty($errors)) {
+            $_SESSION['errors'] = $errors;
+            $this->accounts();
+            exit;
+        }
         
         $this->accountsModel->updateAccount(
-            $account_id,
-            $account_type,
-            $balance,
-            $status
+            $_POST['account_id'],
+            $_POST['account_type'],
+            $_POST['balance'],
+            $_POST['status']
         );
         
         $this->accounts();
@@ -55,4 +74,22 @@ class AdminController extends BaseController {
         $this->accountsModel->toggleStatus($account_id);
         $this->accounts();
     }
+    public function searchAccounts() {
+        $term = $_GET['term'] ?? '';
+        $status = $_GET['status'] ?? '';
+        $accounts = $this->accountsModel->searchAccounts($term);
+        
+      
+        if ($status) {
+            $accounts = array_filter($accounts, function($account) use ($status) {
+                return $account['status'] === $status;
+            });
+        }
+        
+        header('Content-Type: application/json');
+        echo json_encode(array_values($accounts));
+        exit;
+    }
+
+
 }
