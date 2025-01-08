@@ -39,7 +39,7 @@
     //user Routers
     Route::get('/user/profile', [UserController::class, 'profile']);
     Route::get('/user/account', [UserController::class, 'showAccount']);
-    // Route::post('/user/profile', [UserController::class, 'updateProfile']);
+    Route::post('/user/profile', [UserController::class, 'updateProfile']);
     Route::get('/user/transactions', [UserController::class, 'transactions']);
     // Route::post('/user/transactions', [UserController::class, 'transactionChecker']);
     Route::get('/user/transfer', [UserController::class, 'transfer']);
