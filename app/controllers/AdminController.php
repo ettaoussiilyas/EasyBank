@@ -3,13 +3,16 @@ require_once(__DIR__ . '/../models/Statistics.php');
 require_once(__DIR__ . '/../models/Accounts.php');
 
 
+
 class AdminController extends BaseController {
     private $statsModel;
     private $accountsModel;
+    private $userModel;
 
     public function __construct() {
         $this->statsModel = new Statistics();
         $this->accountsModel = new Accounts();
+        $this->userModel = new User();
     }
 
     public function index() {
@@ -91,5 +94,9 @@ class AdminController extends BaseController {
         exit;
     }
 
+    public function users() {
+        $users = $this->userModel->getAllUsers();
+        $this->renderAdmin('users', ["users" => $users]); 
+    }
 
 }

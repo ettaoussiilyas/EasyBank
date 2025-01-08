@@ -29,14 +29,17 @@
     // Créer une instance de Route
     $route = new Route();
 
-    //Admin Routes
+    //Auth Routes
+    // Route::get('/register', [AuthController::class, 'showRegister']);
     $route::get('/admin', [AdminController::class, 'index']);
     $route::get('/admin/accounts', [AdminController::class, 'accounts']);
     $route::post('/admin/accounts/update', [AdminController::class, 'updateAccount']);
     $route::post('/admin/accounts/delete', [AdminController::class, 'deleteAccount']);
     $route::post('/admin/accounts/toggle-status', [AdminController::class, 'toggleStatus']);
-    $route::post('/admin/accounts/create', [AdminController::class, 'CreatAccount']);
     $route::get('/admin/accounts/search', [AdminController::class, 'searchAccounts']);
+    $route::get('/admin/users', [AdminController::class, 'users']);
+
+  
 
 
 
