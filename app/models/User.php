@@ -15,6 +15,13 @@
             return $stmt->fetch();
         }
 
+        public function getUserById($id){
+            $sql = "SELECT * FROM users WHERE id = :id";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute(['id' => $id]);
+            return $stmt->fetch();
+        }
+
         public function insertUser($user){
 
             $stmt = $this->conn->prepare("INSERT INTO users(name,email,password) values (?,?,?)");
@@ -36,6 +43,7 @@
             return $stmt->fetch()['status'];
             
         }
+
     }
 
 

@@ -90,8 +90,6 @@
                 $result = $this->userModel->updateUser($updateData);
                 if($result){
                     $data['successProfileUpdate'] = 'Profile updated successfully';
-                } else {
-                    $data['failedProfileUpdate'] = 'Profile update failed';
                 }
                 
                 return $this->renderClient('profile', $data);

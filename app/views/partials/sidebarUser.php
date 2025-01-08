@@ -5,13 +5,7 @@
             Profile
         </a>
         <a href="/user/account" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-violet-600">
-            My Account
-        </a>
-        <a href="/user/transactions" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-violet-600">
-            My Transactions
-        </a>
-        <a href="/user/withdraw" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-violet-600">
-            Withdraw
+            Account
         </a>
         <a href="/user/deposit" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-violet-600">
             Deposit

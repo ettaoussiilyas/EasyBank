@@ -8,6 +8,7 @@
     require_once '../app/controllers/AuthController.php';
     require_once '../app/controllers/AdminController.php';
     require_once '../app/controllers/UserController.php';
+    require_once '../app/controllers/AccountController.php';
 
 
     session_start();
@@ -48,6 +49,8 @@
     // Route::post('/user/withdraw', [UserController::class, 'withdrawChecker']);
     Route::get('/user/deposit', [UserController::class, 'deposit']);
     // Route::post('/user/deposit', [UserController::class, 'depositChecker']);
+    Route::get('/user/account', [AccountController::class, 'showAccount']);
+
 
 
 
