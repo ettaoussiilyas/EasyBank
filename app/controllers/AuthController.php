@@ -26,10 +26,8 @@
             $this->render('auth/login');
         }
 
-        //showing register page
-        public function showRegister(){
-            $this->render('auth/register');
-        }
+
+
 
         public function loginChecker(){
             if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])){
@@ -54,23 +52,23 @@
 
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_name'] = $user['name'];
-                $_SESSION['profile_pic'] = $user['profile_pic'];
+                $_SESSION['user_profile_pic'] = $user['profile_pic'];
+                $_SESSION['user_email'] = $user['email'  ];
+                
+                $status = $this->userModel->getStatus($user['id']);
+                $_SESSION['status'] = $status;
 
                 $id= (int)$user['id'];
                 if($user['id']==1){
-                    header('Location: /home');
+                    header('Location: /admin');
                     exit;
                 }else{
-                    header('Location: /client/profile/');
+                    header('Location: /user/profile');
                     exit;
                 }
             }
             
             $this->render('auth/login');
-        }
-
-        public function registerChecker(){
-            $this->render('auth/register');
         }
 
     }

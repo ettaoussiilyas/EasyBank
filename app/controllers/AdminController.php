@@ -1,7 +1,7 @@
 <?php
 require_once(__DIR__ . '/../models/Statistics.php');
 require_once(__DIR__ . '/../models/Accounts.php');
-require_once(__DIR__ . '/../models/Users.php');
+require_once(__DIR__ . '/../models/User.php');
 
 
 
@@ -54,23 +54,32 @@ class AdminController extends BaseController {
             exit;
         }
         
-        $this->accountsModel->updateAccount(
+        $result = $this->accountsModel->updateAccount(
             $_POST['account_id'],
             $_POST['account_type'],
             $_POST['status']
         );
         
+        if ($result) {
+            $_SESSION['success'] = "Account updated successfully";
+        } else {
+            $_SESSION['errors'] = ["Failed to update account"];
+        }
+        
         $this->accounts();
+        exit;
     }
 
     public function deleteAccount() {
         $account_id = $_POST['account_id'];
         $this->accountsModel->deleteAccount($account_id);
+        $_SESSION['success'] = "Account deleted successfully";
         $this->accounts();
     }
     public function toggleStatus() {
         $account_id = $_POST['account_id'];
         $this->accountsModel->toggleStatus($account_id);
+        $_SESSION['success'] = "Account status updated successfully";
         $this->accounts();
     }
     public function searchAccounts() {
@@ -98,8 +107,23 @@ class AdminController extends BaseController {
     public function createUser() {
         $errors = [];
         
-        if (empty($_POST['name']) || strlen($_POST['name']) < 2) {
-            $errors[] = "Name must be at least 2 characters long";
+        if (empty($_POST['name'])) {
+            $errors[] = "Name is required";
+        } else {
+            $name = trim($_POST['name']);
+            
+            if (strlen($name) < 2) {
+                $errors[] = "Name must be at least 2 characters long";
+            }
+            
+            
+            
+
+            if (!preg_match('/^[a-zA-ZÀ-ÿ\s\'-]+$/', $name)) {
+                $errors[] = "Name contains invalid characters";
+            }
+            
+            $_POST['name'] = $name;
         }
         
         if (empty($_POST['email']) || !filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
@@ -116,25 +140,35 @@ class AdminController extends BaseController {
             exit;
         }
         
-        try {
-            $result = $this->usersModel->createUser(
-                $_POST['name'],
-                $_POST['email'],
-                $_POST['profile_pic'] ?? null
-            );
-            
-            if ($result['success']) {
-                $_SESSION['success'] = "User created successfully. Generated password: " . $result['password'];
-            } else {
-                $_SESSION['errors'] = ["Failed to create user"];
-            }
-            
-        } catch (PDOException $e) {
-            if ($e->getCode() == 23000) {
-                $_SESSION['errors'] = ["This email address is already in use"];
-            } else {
-                $_SESSION['errors'] = ["An error occurred while creating the user"];
-            }
+        $result = $this->usersModel->createUser(
+            $_POST['name'],
+            $_POST['email'],
+            $_POST['profile_pic'] ?? null
+        );
+        
+        if ($result['success']) {
+            $_SESSION['success'] = "User created successfully. Generated password: " . $result['password'];
+        } else {
+            $_SESSION['errors'] = ["Failed to create user"];
+        }
+        
+        $this->users();
+        exit;
+    }
+
+    public function deleteUser() {
+        if (empty($_POST['user_id']) || !is_numeric($_POST['user_id'])) {
+            $_SESSION['errors'] = ["Invalid user ID"];
+            $this->users();
+            exit;
+        }
+
+        $result = $this->usersModel->deleteUser($_POST['user_id']);
+        
+        if ($result) {
+            $_SESSION['success'] = "User deleted successfully";
+        } else {
+            $_SESSION['errors'] = ["Failed to delete user"];
         }
         
         $this->users();

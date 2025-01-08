@@ -7,9 +7,18 @@ require_once(__DIR__ . '/../partials/sidebar.php');
 
 <?php if (isset($_SESSION['errors'])): ?>
     <script>
+        console.log('Errors:', <?= json_encode($_SESSION['errors']) ?>);
         showErrorAlert(<?= json_encode($_SESSION['errors']) ?>);
     </script>
     <?php unset($_SESSION['errors']); ?>
+<?php endif; ?>
+
+<?php if (isset($_SESSION['success'])): ?>
+    <script>
+        console.log('Success:', <?= json_encode($_SESSION['success']) ?>);
+        showSuccessAlert(<?= json_encode($_SESSION['success']) ?>);
+    </script>
+    <?php unset($_SESSION['success']); ?>
 <?php endif; ?>
 
 

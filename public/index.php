@@ -7,6 +7,8 @@
     require_once '../core/Route.php';
     require_once '../app/controllers/AuthController.php';
     require_once '../app/controllers/AdminController.php';
+    require_once '../app/controllers/UserController.php';
+    require_once '../app/controllers/AccountController.php';
 
 
     session_start();
@@ -22,9 +24,7 @@
     //hadling login
     Route::get('/login', [AuthController::class, 'showLogin']);
     Route::post('/login', [AuthController::class, 'loginChecker']);
-    //handling register
-    Route::get('/register', [AuthController::class, 'showRegister']);
-    Route::post('/register', [AuthController::class, 'registerChecker']);
+
 
     // Créer une instance de Route
     $route = new Route();
@@ -39,7 +39,24 @@
     $route::get('/admin/accounts/search', [AdminController::class, 'searchAccounts']);
     $route::post('/admin/users/create', [AdminController::class, 'createUser']);
     $route::get('/admin/users', [AdminController::class, 'users']);
-    $route::post('//admin/users/update', [AdminController::class, 'UpdatUser']);
+    $route::post('/admin/users/update', [AdminController::class, 'UpdatUser']);
+    $route::post('/admin/users/delete', [AdminController::class, 'deleteUser']);
+
+    //user Routers
+    Route::get('/user/profile', [UserController::class, 'profile']);
+    Route::get('/user/account', [UserController::class, 'showAccount']);
+    Route::post('/user/profile', [UserController::class, 'updateProfile']);
+    Route::get('/user/transactions', [UserController::class, 'transactions']);
+    // Route::post('/user/transactions', [UserController::class, 'transactionChecker']);
+    Route::get('/user/transfer', [UserController::class, 'transfer']);
+    // Route::post('/user/transfer', [UserController::class, 'transferChecker']);
+    Route::get('/user/withdraw', [UserController::class, 'withdraw']);
+    // Route::post('/user/withdraw', [UserController::class, 'withdrawChecker']);
+    Route::get('/user/deposit', [UserController::class, 'deposit']);
+    // Route::post('/user/deposit', [UserController::class, 'depositChecker']);
+    Route::get('/user/account', [AccountController::class, 'showAccount']);
+
+
 
 
     $router->dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);

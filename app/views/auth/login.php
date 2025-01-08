@@ -59,10 +59,6 @@
                                class="w-full py-3 text-white bg-violet-600 rounded-md font-semibold hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-600 focus:ring-opacity-50">
                     </div>
                 </form>
-                <div class="flex items-center justify-center mt-2">
-                    <p>You don't have an account?</p>
-                    <a href="/register" class="text-violet-600 ml-2">SignUp</a>
-                </div>
             </div>
         </div>
     </div>
