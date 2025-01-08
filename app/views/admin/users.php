@@ -64,10 +64,12 @@ require_once(__DIR__ . '/../partials/sidebar.php');
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex items-center gap-3">
 
                                 <button class="p-1.5 rounded-lg hover:bg-violet-50 edit-user-btn"
-                                        data-user-id="<?= $user['id'] ?>"
-                                        data-name="<?= htmlspecialchars($user['name']) ?>"
-                                        data-email="<?= htmlspecialchars($user['email']) ?>"
-                                        data-profile-pic="<?= htmlspecialchars($user['profile_pic'] ?? '') ?>">
+                                        onclick="showUpdateUserModal(
+                                            <?= $user['id'] ?>, 
+                                            '<?= htmlspecialchars($user['name']) ?>', 
+                                            '<?= htmlspecialchars($user['email']) ?>', 
+                                            '<?= htmlspecialchars($user['profile_pic'] ?? '') ?>'
+                                        )">
                                     <svg class="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -203,7 +205,7 @@ require_once(__DIR__ . '/../partials/sidebar.php');
                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500">
                 </div>
 
-                <div>
+                <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Profile Picture URL</label>
                     <input type="url" 
                            id="updateProfilePic"
@@ -211,42 +213,19 @@ require_once(__DIR__ . '/../partials/sidebar.php');
                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500">
                 </div>
 
-                <div class="pt-4 border-t">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-sm font-medium text-gray-700">Change Password</span>
-                        <button type="button" 
-                                onclick="togglePasswordFields()"
-                                class="text-sm text-violet-600 hover:text-violet-700">
-                            Show password fields
-                        </button>
+                <div class="mb-4">
+                    <div class="flex items-center">
+                        <input type="checkbox" 
+                               id="generateNewPassword"
+                               name="generate_new_password"
+                               class="h-4 w-4 text-violet-600 focus:ring-violet-500 border-gray-300 rounded">
+                        <label for="generateNewPassword" class="ml-2 block text-sm text-gray-700">
+                            Generate new password
+                        </label>
                     </div>
-                    
-                    <div id="passwordFields" class="hidden space-y-3">
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
-                            <input type="password" 
-                                   name="current_password"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
-                                   placeholder="Enter current password">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
-                            <input type="password" 
-                                   name="new_password"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
-                                   placeholder="Enter new password">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
-                            <input type="password" 
-                                   name="confirm_password"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
-                                   placeholder="Confirm new password">
-                        </div>
-                    </div>
+                    <p class="mt-1 text-sm text-gray-500">
+                        If checked, a new password will be generated and displayed after update
+                    </p>
                 </div>
 
                 <!-- Submit Buttons -->
@@ -267,6 +246,19 @@ require_once(__DIR__ . '/../partials/sidebar.php');
 </div>
 
 <script>
+    function showUpdateUserModal(userId, name, email, profilePic) {
+        document.getElementById('updateUserId').value = userId;
+        document.getElementById('updateName').value = name;
+        document.getElementById('updateEmail').value = email;
+        document.getElementById('updateProfilePic').value = profilePic || '';
+        document.getElementById('generateNewPassword').checked = false;
+        document.getElementById('updateUserModal').classList.remove('hidden');
+    }
+
+    function closeUpdateUserModal() {
+        document.getElementById('updateUserModal').classList.add('hidden');
+    }
+
     function showCreateUserModal() {
         document.getElementById('createUserModal').classList.remove('hidden');
     }
@@ -275,38 +267,20 @@ require_once(__DIR__ . '/../partials/sidebar.php');
         document.getElementById('createUserModal').classList.add('hidden');
     }
 
+    // Fermer les modales en cliquant en dehors
+    window.onclick = function(event) {
+        const updateModal = document.getElementById('updateUserModal');
+        const createModal = document.getElementById('createUserModal');
+        if (event.target == updateModal) {
+            closeUpdateUserModal();
+        }
+        if (event.target == createModal) {
+            closeCreateUserModal();
+        }
+    }
+
+    // Bouton pour ouvrir le modal de création
     document.querySelector('button.bg-violet-600').onclick = showCreateUserModal;
-
-    function showUpdateUserModal(userId, name, email, profilePic) {
-        document.getElementById('updateUserId').value = userId;
-        document.getElementById('updateName').value = name;
-        document.getElementById('updateEmail').value = email;
-        document.getElementById('updateProfilePic').value = profilePic || '';
-        document.getElementById('updateUserModal').classList.remove('hidden');
-    }
-
-    function closeUpdateUserModal() {
-        document.getElementById('updateUserModal').classList.add('hidden');
-        document.getElementById('passwordFields').classList.add('hidden');
-    }
-
-    function togglePasswordFields() {
-        const passwordFields = document.getElementById('passwordFields');
-        const isHidden = passwordFields.classList.contains('hidden');
-        passwordFields.classList.toggle('hidden');
-        event.target.textContent = isHidden ? 'Hide password fields' : 'Show password fields';
-    }
-
-   
-    document.querySelectorAll('.edit-user-btn').forEach(btn => {
-        btn.onclick = function() {
-            const userId = this.dataset.userId;
-            const name = this.dataset.name;
-            const email = this.dataset.email;
-            const profilePic = this.dataset.profilePic;
-            showUpdateUserModal(userId, name, email, profilePic);
-        };
-    });
 </script>
 
 <?php require_once(__DIR__ . '/../partials/footer.php'); ?>

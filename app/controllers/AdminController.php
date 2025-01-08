@@ -175,4 +175,65 @@ class AdminController extends BaseController {
         exit;
     }
 
+    public function updateUser() {
+        $errors = [];
+        
+        if (empty($_POST['user_id']) || !is_numeric($_POST['user_id'])) {
+            $errors[] = "Invalid user ID";
+        }
+
+        if (empty($_POST['name'])) {
+            $errors[] = "Name is required";
+        } else {
+            $name = trim($_POST['name']);
+            if (strlen($name) < 2) {
+                $errors[] = "Name must be at least 2 characters long";
+            }
+            if (!preg_match('/^[a-zA-ZÀ-ÿ\s\'-]+$/', $name)) {
+                $errors[] = "Name contains invalid characters";
+            }
+        }
+        
+        if (empty($_POST['email']) || !filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+            $errors[] = "Invalid email address";
+        }
+        
+        if (!empty($_POST['profile_pic']) && !filter_var($_POST['profile_pic'], FILTER_VALIDATE_URL)) {
+            $errors[] = "Invalid profile picture URL";
+        }
+        
+        if (!empty($errors)) {
+            $_SESSION['errors'] = $errors;
+            $this->users();
+            exit;
+        }
+
+        
+        $password = null;
+        if (isset($_POST['generate_new_password']) && $_POST['generate_new_password'] === 'on') {
+            $password = bin2hex(random_bytes(6));
+        }
+
+        $result = $this->usersModel->updateUsers(
+            $_POST['user_id'],
+            $_POST['name'],
+            $_POST['email'],
+            $password,
+            $_POST['profile_pic'] ?? null
+        );
+        
+        if ($result) {
+            $success_message = "User updated successfully";
+            if ($password) {
+                $success_message .= ". New password: " . $password;
+            }
+            $_SESSION['success'] = $success_message;
+        } else {
+            $_SESSION['errors'] = ["Failed to update user"];
+        }
+        
+        $this->users();
+        exit;
+    }
+
 }

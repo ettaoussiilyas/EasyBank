@@ -39,7 +39,7 @@
     $route::get('/admin/accounts/search', [AdminController::class, 'searchAccounts']);
     $route::post('/admin/users/create', [AdminController::class, 'createUser']);
     $route::get('/admin/users', [AdminController::class, 'users']);
-    $route::post('/admin/users/update', [AdminController::class, 'UpdatUser']);
+    $route::post('/admin/users/update', [AdminController::class, 'updateUser']);
     $route::post('/admin/users/delete', [AdminController::class, 'deleteUser']);
 
     //user Routers

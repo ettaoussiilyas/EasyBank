@@ -77,17 +77,27 @@ class User extends Db
         ];
     }
 
-    public function updateUsers($id, $name, $email, $password, $profile_pic = null)
-    {
-        $sql = "UPDATE users SET name = ?, email = ?, password = ?, profile_pic = ? WHERE id = ?";
-        $stmt = $this->conn->prepare($sql);
-        return $stmt->execute([
-            $name,
-            $email,
-            password_hash($password, PASSWORD_DEFAULT),
-            $profile_pic,
-            $id
-        ]);
+    public function updateUsers($id, $name, $email, $password = null, $profile_pic = null) {
+        if ($password) {
+            $sql = "UPDATE users SET name = ?, email = ?, password = ?, profile_pic = ? WHERE id = ?";
+            $stmt = $this->conn->prepare($sql);
+            return $stmt->execute([
+                $name,
+                $email,
+                password_hash($password, PASSWORD_DEFAULT),
+                $profile_pic,
+                $id
+            ]);
+        } else {
+            $sql = "UPDATE users SET name = ?, email = ?, profile_pic = ? WHERE id = ?";
+            $stmt = $this->conn->prepare($sql);
+            return $stmt->execute([
+                $name,
+                $email,
+                $profile_pic,
+                $id
+            ]);
+        }
     }
 
      public function deleteUser($id) {

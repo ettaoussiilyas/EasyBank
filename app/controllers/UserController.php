@@ -12,7 +12,7 @@
             $this->userModel = new User();
         }
 
-        //update user
+
 
         public function updateUser(){
 
