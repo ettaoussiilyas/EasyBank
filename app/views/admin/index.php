@@ -20,7 +20,7 @@ require_once(__DIR__ . '/../partials/sidebar.php');
                         </svg>
                     </div>
                     <div class="ml-4">
-                        <h3 class="text-gray-500 text-sm">Total Clients</h3>
+                        <h3 class="text-gray-500 text-sm">Total Customers</h3>
                         <p class="text-2xl font-bold text-gray-800"><?= number_format($data['totalClients']) ?></p>
                     </div>
                 </div>
@@ -35,7 +35,7 @@ require_once(__DIR__ . '/../partials/sidebar.php');
                         </svg>
                     </div>
                     <div class="ml-4">
-                        <h3 class="text-gray-500 text-sm">Comptes Actifs</h3>
+                        <h3 class="text-gray-500 text-sm">Active Accounts</h3>
                         <p class="text-2xl font-bold text-gray-800"><?= number_format($data['activeAccounts']) ?></p>
                     </div>
                 </div>
@@ -65,7 +65,7 @@ require_once(__DIR__ . '/../partials/sidebar.php');
                         </svg>
                     </div>
                     <div class="ml-4">
-                        <h3 class="text-gray-500 text-sm">Solde Total</h3>
+                        <h3 class="text-gray-500 text-sm">Total Balance</h3>
                         <p class="text-2xl font-bold text-gray-800"><?= number_format($data['totalBalance'], 2) ?> €</p>
                     </div>
                 </div>
@@ -77,7 +77,7 @@ require_once(__DIR__ . '/../partials/sidebar.php');
             <!-- Latest Transactions -->
             <div class="bg-white rounded-lg shadow">
                 <div class="p-4 border-b">
-                    <h3 class="text-lg font-semibold">Dernières Transactions</h3>
+                    <h3 class="text-lg font-semibold">Latest Transactions</h3>
                 </div>
                 <div class="p-4">
                     <div class="space-y-4">
@@ -99,7 +99,7 @@ require_once(__DIR__ . '/../partials/sidebar.php');
             <!-- New Accounts -->
             <div class="bg-white rounded-lg shadow">
                 <div class="p-4 border-b">
-                    <h3 class="text-lg font-semibold">Nouveaux Comptes</h3>
+                    <h3 class="text-lg font-semibold">New Accounts</h3>
                 </div>
                 <div class="p-4">
                     <div class="space-y-4">
@@ -110,9 +110,9 @@ require_once(__DIR__ . '/../partials/sidebar.php');
                                 </div>
                                 <div class="ml-4">
                                     <p class="font-semibold"><?= htmlspecialchars($account['client_name']) ?></p>
-                                    <p class="text-sm text-gray-500">Compte <?= $account['account_type'] ?></p>
+                                    <p class="text-sm text-gray-500">Account <?= $account['account_type'] ?></p>
                                 </div>
-                                <span class="ml-auto text-green-600">Actif</span>
+                                <span class="ml-auto text-green-600">Active</span>
                             </div>
                         <?php endforeach; ?>
                     </div>

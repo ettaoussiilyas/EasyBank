@@ -38,11 +38,11 @@ CREATE TABLE transactions (
 
 
 
--- Insertion des utilisateurs
-INSERT INTO users (name, email, password) VALUES
-('Jean Dupont', 'jean.dupont@email.com', '$2y$10$abcdef123456789'),
-('Marie Martin', 'marie.martin@email.com', '$2y$10$ghijkl987654321'),
-('Pierre Durand', 'pierre.durand@email.com', '$2y$10$mnopqr456789123');
+-- Insertion des utilisateurs avec photos de profil
+INSERT INTO users (name, email, password, profile_pic) VALUES
+('Jean Dupont', 'jean.dupont@email.com', '$2y$10$abcdef123456789', 'https://randomuser.me/api/portraits/men/1.jpg'),
+('Marie Martin', 'marie.martin@email.com', '$2y$10$ghijkl987654321', 'https://randomuser.me/api/portraits/women/2.jpg'),
+('Pierre Durand', 'pierre.durand@email.com', '$2y$10$mnopqr456789123', 'https://randomuser.me/api/portraits/men/3.jpg');
 
 -- Insertion des comptes
 INSERT INTO accounts (user_id, account_type, balance) VALUES
@@ -68,6 +68,8 @@ INSERT INTO transactions (account_id, transaction_type, amount, beneficiary_acco
 (2, 'transfert', 500.00, 4),
 (3, 'transfert', 250.00, 5);
 
--- Ajout de l'administrateur
-INSERT INTO users (id, name, email, password) VALUES 
-(1, 'admin', 'admin@gmail.com', '$2y$10$abcdef123456789'); 
+-- Ajout de l'administrateur avec photo de profil
+INSERT INTO users (id, name, email, password, profile_pic) VALUES 
+(1, 'admin', 'admin@gmail.com', '$2y$10$abcdef123456789', 'https://randomuser.me/api/portraits/men/4.jpg'); 
+
+-- Mise à jour des photos de profil pour les utilisateurs existants
