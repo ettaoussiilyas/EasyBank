@@ -33,15 +33,13 @@ class AdminController extends BaseController {
         $account_id = $_POST['account_id'];
         $account_type = $_POST['account_type'];
         $balance = $_POST['balance'];
-        $name = $_POST['name'];
-        $email = $_POST['email'];
+        $status = $_POST['status'];
         
         $this->accountsModel->updateAccount(
             $account_id,
             $account_type,
             $balance,
-            $name,
-            $email
+            $status
         );
         
         $this->accounts();
@@ -50,6 +48,11 @@ class AdminController extends BaseController {
     public function deleteAccount() {
         $account_id = $_POST['account_id'];
         $this->accountsModel->deleteAccount($account_id);
+        $this->accounts();
+    }
+    public function toggleStatus() {
+        $account_id = $_POST['account_id'];
+        $this->accountsModel->toggleStatus($account_id);
         $this->accounts();
     }
 }

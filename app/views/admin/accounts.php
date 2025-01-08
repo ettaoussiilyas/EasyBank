@@ -58,17 +58,24 @@ require_once(__DIR__ . '/../partials/sidebar.php');
                                 <span class="balance-amount"><?= $account['balance'] ?></span> €
                             </td>
                             <td class="px-6 py-4">
-                                <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Active</span>
+                                <form method="POST" action="/admin/accounts/toggle-status" class="inline">
+                                    <input type="hidden" name="account_id" value="<?= $account['id'] ?>">
+                                    <button type="submit"
+                                        class="px-2 py-1 text-xs rounded-full cursor-pointer
+                       <?= $account['status'] === 'active'
+                            ? 'bg-green-100 text-green-800 hover:bg-red-100 hover:text-red-800'
+                            : 'bg-red-100 text-red-800 hover:bg-green-100 hover:text-green-800' ?>">
+                                        <?= $account['status'] ?>
+                                    </button>
+                                </form>
                             </td>
                             <td class="px-6 py-4">
                                 <button type="button" onclick="showUpdateForm(
-                                <?= $account['id'] ?>, 
-                                '<?= htmlspecialchars($account['name']) ?>', 
-                                '<?= htmlspecialchars($account['email']) ?>', 
-                                '<?= $account['account_type'] ?>', 
-                                '<?= $account['balance'] ?>',
-                                '<?= $account['profile_pic'] ?? 'https://randomuser.me/api/portraits/lego/1.jpg' ?>'
-                            )" class="text-violet-600 hover:text-violet-800 mr-2">
+    <?= $account['id'] ?>, 
+    '<?= htmlspecialchars($account['account_type']) ?>', 
+    '<?= $account['balance'] ?>',
+    '<?= $account['status'] ?>'
+)" class="text-violet-600 hover:text-violet-800 mr-2">
                                     Edit
                                 </button>
                                 <form method="POST"
@@ -98,32 +105,7 @@ require_once(__DIR__ . '/../partials/sidebar.php');
             <form id="updateForm" method="POST" action="/admin/accounts/update">
                 <input type="hidden" id="accountId" name="account_id">
 
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Profile Picture URL</label>
-                    <input type="text"
-                        id="profilePicUrl"
-                        name="profile_pic"
-                        placeholder="https://randomuser.me/api/portraits/men/1.jpg"
-                        class="shadow border rounded w-full py-2 px-3 text-gray-700">
-                </div>
-
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Customer Name</label>
-                    <input type="text"
-                        name="name"
-                        id="clientName"
-                        class="shadow border rounded w-full py-2 px-3 text-gray-700">
-                </div>
-
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
-                    <input type="email"
-                        name="email"
-                        id="clientEmail"
-                        class="shadow border rounded w-full py-2 px-3 text-gray-700">
-                </div>
-
-
+                <!-- Account Type -->
                 <div class="mb-4">
                     <label class="block text-gray-700 text-sm font-bold mb-2">Account Type</label>
                     <select name="account_type" class="shadow border rounded w-full py-2 px-3 text-gray-700">
@@ -132,12 +114,22 @@ require_once(__DIR__ . '/../partials/sidebar.php');
                     </select>
                 </div>
 
+                <!-- Balance -->
                 <div class="mb-4">
                     <label class="block text-gray-700 text-sm font-bold mb-2">Balance</label>
                     <input type="number"
                         name="balance"
                         step="0.01"
                         class="shadow border rounded w-full py-2 px-3 text-gray-700">
+                </div>
+
+                <!-- Status -->
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Status</label>
+                    <select name="status" class="shadow border rounded w-full py-2 px-3 text-gray-700">
+                        <option value="active">active</option>
+                        <option value="inactive">inactive</option>
+                    </select>
                 </div>
 
                 <div class="flex justify-end gap-4">
@@ -155,20 +147,15 @@ require_once(__DIR__ . '/../partials/sidebar.php');
     </div>
 </div>
 
-
-
 <script>
-    function showUpdateForm(id, clientName, clientEmail, accountType, balance, profilePic) {
+    function showUpdateForm(id, accountType, balance, status) {
         const modal = document.getElementById('updateModal');
         const form = document.getElementById('updateForm');
 
         document.getElementById('accountId').value = id;
-        document.getElementById('clientName').value = clientName;
-        document.getElementById('clientEmail').value = clientEmail;
-        document.getElementById('profilePicUrl').value = profilePic;
         form.account_type.value = accountType;
         form.balance.value = balance;
-
+        form.status.value = status;
 
         modal.classList.remove('hidden');
     }
@@ -177,8 +164,6 @@ require_once(__DIR__ . '/../partials/sidebar.php');
         document.getElementById('updateModal').classList.add('hidden');
     }
 
-
-
     window.onclick = function(event) {
         const modal = document.getElementById('updateModal');
         if (event.target == modal) {
@@ -186,8 +171,5 @@ require_once(__DIR__ . '/../partials/sidebar.php');
         }
     }
 </script>
-
-
-
 
 <?php require_once(__DIR__ . '/../partials/footer.php'); ?>

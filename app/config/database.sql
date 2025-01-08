@@ -68,8 +68,4 @@ INSERT INTO transactions (account_id, transaction_type, amount, beneficiary_acco
 (2, 'transfert', 500.00, 4),
 (3, 'transfert', 250.00, 5);
 
--- Ajout de l'administrateur avec photo de profil
-INSERT INTO users (id, name, email, password, profile_pic) VALUES 
-(1, 'admin', 'admin@gmail.com', '$2y$10$abcdef123456789', 'https://randomuser.me/api/portraits/men/4.jpg'); 
 
--- Mise à jour des photos de profil pour les utilisateurs existants

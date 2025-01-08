@@ -75,7 +75,8 @@ class Statistics extends Db {
         $stmt = $this->conn->query("
             SELECT 
                 a.*,
-                u.name as client_name
+                u.name as client_name,
+                a.status
             FROM accounts a
             JOIN users u ON a.user_id = u.id
             WHERE u.id != 1

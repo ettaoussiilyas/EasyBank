@@ -112,7 +112,7 @@ require_once(__DIR__ . '/../partials/sidebar.php');
                                     <p class="font-semibold"><?= htmlspecialchars($account['client_name']) ?></p>
                                     <p class="text-sm text-gray-500">Account <?= $account['account_type'] ?></p>
                                 </div>
-                                <span class="ml-auto text-green-600">Active</span>
+                                <span class="ml-auto <?= $account['status'] === 'active' ? 'text-green-600' : 'text-red-600' ?>"><?= $account['status'] ?></span>
                             </div>
                         <?php endforeach; ?>
                     </div>
