@@ -148,20 +148,143 @@ class Accounts extends Db {
     public function getAccountsById($id) {
 
         $stmt = $this->conn->prepare("SELECT * FROM accounts WHERE user_id =?");
-        // $stmt = $this->conn->prepare("
-        //     SELECT 
-        //         accounts.*,
-        //         users.name as name,
-        //         users.email as email,
-        //         users.profile_pic
-        //     FROM accounts 
-        //     JOIN users ON accounts.user_id = users.id
-        //     WHERE accounts.user_id = ?
-        // ");
         $stmt->bindParam(1, $id, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    public function getAccountById($id) {
 
+        $stmt = $this->conn->prepare("SELECT * FROM accounts WHERE id =?");
+
+        $stmt->bindParam(1, $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function withdraw($account_id, $amount, $description, $user_id) {
+        try {
+            $this->conn->beginTransaction();
+            
+            // Get account details
+            $account = $this->getAccountById($account_id);
+            if (!$account) {
+                throw new Exception("Account not found");
+            }
+
+            // Check sufficient balance
+            if ($account['balance'] < $amount) {
+                throw new Exception("Insufficient funds");
+            }
+
+            if ($account['account_type'] === 'epargne') {
+                // L9a compte courant dial nefs user
+                $stmt = $this->conn->prepare("SELECT id FROM accounts WHERE user_id = ? AND account_type = 'courant' LIMIT 1");
+                $stmt->execute([$account['user_id']]);
+                $currentAccount = $stmt->fetch(PDO::FETCH_ASSOC);
+                
+                if (!$currentAccount) {
+                    throw new Exception("Khassek dir compte courant 9bel ma tqed tkhrej flous men compte épargne");
+                }
+
+                // N9es men compte épargne
+                $sql = "UPDATE accounts SET balance = balance - ? WHERE id = ?";
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute([$amount, $account_id]);
+
+                // Zid f compte courant
+                $sql = "UPDATE accounts SET balance = balance + ? WHERE id = ?";
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute([$amount, $currentAccount['id']]);
+
+                // Ssjel transaction dial compte épargne (retrait)
+                $sql = "INSERT INTO transactions (account_id, transaction_type, amount, beneficiary_account_id) 
+                        VALUES (?, 'retrait', ?, ?)";
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute([$account_id, $amount, $currentAccount['id']]);
+
+            } else {
+                // Compte courant: n9es direct
+                $sql = "UPDATE accounts SET balance = balance - ? WHERE id = ?";
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute([$amount, $account_id]);
+
+                // Ssjel transaction
+                $sql = "INSERT INTO transactions (account_id, transaction_type, amount, beneficiary_account_id) 
+                        VALUES (?, 'retrait', ?, NULL)";
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute([$account_id, $amount]);
+            }
+
+            $this->conn->commit();
+            return true;
+
+        } catch (Exception $e) {
+            $this->conn->rollBack();
+            throw $e;
+        }
+    }
+
+    public function deposit($account_id, $amount, $description, $user_id) {
+        try {
+            $this->conn->beginTransaction();
+            
+            // Get account details
+            $account = $this->getAccountById($account_id);
+            if (!$account) {
+                throw new Exception("Account not found");
+            }
+
+            if ($account['account_type'] === 'epargne') {
+                // L9a compte courant dial nefs user
+                $stmt = $this->conn->prepare("SELECT id, balance FROM accounts WHERE user_id = ? AND account_type = 'courant' LIMIT 1");
+                $stmt->execute([$account['user_id']]);
+                $currentAccount = $stmt->fetch(PDO::FETCH_ASSOC);
+                
+                if (!$currentAccount) {
+                    throw new Exception("Khassek dir compte courant 9bel ma tqed tzid flous f compte épargne");
+                }
+
+                // Check sufficient balance f compte courant
+                if ($currentAccount['balance'] < $amount) {
+                    throw new Exception("Ma3endekch flus kafyin f compte courant");
+                }
+
+                // N9es men compte courant
+                $sql = "UPDATE accounts SET balance = balance - ? WHERE id = ?";
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute([$amount, $currentAccount['id']]);
+
+                // Zid f compte épargne
+                $sql = "UPDATE accounts SET balance = balance + ? WHERE id = ?";
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute([$amount, $account_id]);
+
+                // Ssjel transaction dial compte courant (transfert)
+                $sql = "INSERT INTO transactions (account_id, transaction_type, amount, beneficiary_account_id) 
+                        VALUES (?, 'transfert', ?, ?)";
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute([$currentAccount['id'], $amount, $account_id]);
+
+            } else {
+                // Compte courant: zid direct
+                $sql = "UPDATE accounts SET balance = balance + ? WHERE id = ?";
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute([$amount, $account_id]);
+
+                // Ssjel transaction
+                $sql = "INSERT INTO transactions (account_id, transaction_type, amount, beneficiary_account_id) 
+                        VALUES (?, 'depot', ?, NULL)";
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute([$account_id, $amount]);
+            }
+
+            $this->conn->commit();
+            return true;
+
+        } catch (Exception $e) {
+            $this->conn->rollBack();
+            throw $e;
+        }
+    }
 
 }

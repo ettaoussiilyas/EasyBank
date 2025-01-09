@@ -16,44 +16,46 @@ $accounts = isset($data['accounts']) ? $data['accounts'] : null;
                 <div class="p-6 space-y-6">
                     <div class="flex justify-between items-center">
                         <div class="space-y-1">
-                            <h3 class="text-xl font-semibold text-gray-800">Compte <?echo $account["account_type"] ?></h3>
+                            <h3 class="text-xl font-semibold text-gray-800">Account <?php echo $account["account_type"] ?></h3>
                             <p class="text-sm text-gray-500 font-mono">FR76 1234 5678 9012</p>
                         </div>
                         <div class="text-right">
                             <p class="text-3xl font-bold text-gray-900">€<?php echo $account["balance"] ?></p>
                             <?php
-                            if ($account["status"] == "active") {
-                                echo
-                                '<span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 animate-pulse">
-                                    Actif
-                                </span>';
-                            } else if ($account["status"] == "inactive") {
-                                echo
-                                '<span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
-                                Bloqué
-                                </span>
-                                ';
-                            }
+                                if ($account["status"] == "active") {
+                                    echo
+                                    '<span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 animate-pulse">
+                                        Active
+                                    </span>';
+                                } else if ($account["status"] == "inactive") {
+                                    echo
+                                    '<span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                                    Blocked
+                                    </span>
+                                    ';
+                                }
                             ?>
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
-                        <a href="/user/myAccounts/depots?id=<?= $account['id'] ?>" class="group flex items-center justify-center p-3 text-blue-600 border border-blue-600 rounded-lg transition-all duration-200 hover:bg-blue-600 hover:text-white">
+                        <a href="/user/deposit?id=<?= $account['id'] ?>" class="group flex items-center justify-center p-3 text-violet-600 border border-violet-600 rounded-lg transition-all duration-200 hover:bg-violet-600 hover:text-white bg-violet-500 text-white">
                             <i data-lucide="plus-circle" class="w-5 h-5 mr-2 transition-transform duration-200 group-hover:rotate-90"></i>
-                            Alimenter
+                            Deposit
                         </a>
-                        <a href="/user/myAccounts/retrait?id=<?= $account['id'] ?>" class="group flex items-center justify-center p-3 text-purple-600 border border-purple-600 rounded-lg transition-all duration-200 hover:bg-purple-600 hover:text-white">
-                            <i data-lucide="download" class="w-5 h-5 mr-2 transition-transform duration-200 group-hover:translate-y-1"></i>
-                            Relevé
+                        <a href="/user/withdraw?id=<?= $account['id'] ?>" class="group flex items-center justify-center p-3 text-violet-600 border border-violet-600 rounded-lg transition-all duration-200 hover:bg-violet-600 hover:text-white bg-violet-500 text-white">
+                            <i data-lucide="plus-circle" class="w-5 h-5 mr-2 transition-transform duration-200 group-hover:rotate-90"></i>
+                            <!-- Withdraw -->
+                             <?php echo ($account['account_type'] == 'epargne') ? 'Transfer' : 'Withdraw'; ?>
                         </a>
+                        
                     </div>
                     <!-- Account details with hover effect -->
                     <div class="pt-6 border-t border-gray-100">
-                        <h4 class="font-medium text-gray-700 mb-4">Détails du compte</h4>
+                        <h4 class="font-medium text-gray-700 mb-4">Account Details</h4>
                         <dl class="grid grid-cols-2 gap-4">
                             <!-- Detail items with hover effect -->
                             <div class="p-3 rounded-lg transition-colors duration-200 hover:bg-gray-50">
-                                <dt class="text-sm text-gray-500">Date d'ouverture</dt>
+                                <dt class="text-sm text-gray-500">Opening Date</dt>
                                 <dd class="mt-1 text-sm font-medium text-gray-900"><?= $account["created_at"] ?></dd>
                             </div>
                             <!-- Add similar styling to other detail items -->
@@ -70,3 +72,4 @@ $accounts = isset($data['accounts']) ? $data['accounts'] : null;
     require_once __DIR__.'/../partials/footer.php';
  
 ?>
+
