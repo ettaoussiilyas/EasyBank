@@ -9,7 +9,7 @@
     require_once '../app/controllers/AdminController.php';
     require_once '../app/controllers/UserController.php';
     require_once '../app/controllers/AccountController.php';
-
+    require_once '../app/controllers/TransferController.php';
 
     session_start();
 
@@ -47,19 +47,22 @@
 
     //user Routers
     Route::get('/user/profile', [UserController::class, 'profile']);
-    Route::get('/user/account', [UserController::class, 'showAccount']);
+    // Route::get('/user/account', [UserController::class, 'showAccount']);
     Route::post('/user/profile', [UserController::class, 'updateProfile']);
     Route::get('/user/transactions', [UserController::class, 'transactions']);
-    // Route::post('/user/transactions', [UserController::class, 'transactionChecker']);
     Route::get('/user/transfer', [UserController::class, 'transfer']);
-    // Route::post('/user/transfer', [UserController::class, 'transferChecker']);
-    Route::get('/user/withdraw', [UserController::class, 'withdraw']);
-    // Route::post('/user/withdraw', [UserController::class, 'withdrawChecker']);
+    Route::get('/user/withdraw', [AccountController::class, 'showWithdraw']);
     Route::get('/user/deposit', [UserController::class, 'deposit']);
-    // Route::post('/user/deposit', [UserController::class, 'depositChecker']);
     Route::get('/user/account', [AccountController::class, 'showAccount']);
 
+    Route::get('/user/deposit', [AccountController::class, 'showDeposit']);
+    Route::post('/user/withdraw', [AccountController::class, 'withdrawChecker']);
+    Route::post('/user/deposit', [AccountController::class, 'depositChecker']);
 
+
+    //transfer routes
+    Route::get('/user/transfer', [TransferController::class, 'showTransfer']);
+   
 
 
     $router->dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);

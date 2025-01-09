@@ -102,25 +102,25 @@ require_once __DIR__.'/../partials/sidebarUser.php';
 
                     <div>
                         <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
-                        <input type="text" id="name" name="name" 
+                        <input type="text" id="name" name="name" value="<?php echo isset($data['name']) ? $data['name'] : ''; ?>"
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border">
                     </div>
 
                     <div>
                         <label for="cdn" class="block text-sm font-medium text-gray-700">CDN Profile</label>
-                        <input type="text" id="cdn" name="cdn" 
+                        <input type="text" id="cdn" name="cdn" value="<?php echo isset($data['profile_pic']) ? $data['profile_pic'] : ''; ?>"
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border">
                     </div>
 
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                        <input type="email" id="email" name="email" required
+                        <input type="email" id="email" name="email" value="<?php echo isset($data['email']) ? $data['email'] : ''; ?>"
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border">
                     </div>
 
                     <div>
                         <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                        <input type="password" id="password" name="password"
+                        <input type="password" id="password" name="password" value="<?php echo isset($data['password']) ? $data['password'] : ''; ?>"
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border">
                     </div>
 
