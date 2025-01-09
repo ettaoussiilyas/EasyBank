@@ -2,18 +2,27 @@
 require_once(__DIR__ . '/../models/Statistics.php');
 require_once(__DIR__ . '/../models/Accounts.php');
 require_once(__DIR__ . '/../models/User.php');
-
-
+require_once(__DIR__ . '/../validators/UserValidator.php');
+require_once(__DIR__ . '/../validators/AccountValidator.php');
 
 class AdminController extends BaseController {
     private $statsModel;
     private $accountsModel;
     private $usersModel;
+    private $userValidator;
+    private $accountValidator;
 
     public function __construct() {
+        if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] != 1) {
+            header('Location: /login');
+            exit;
+        }
+
         $this->statsModel = new Statistics();
         $this->accountsModel = new Accounts();
         $this->usersModel = new User();
+        $this->userValidator = new UserValidator();
+        $this->accountValidator = new AccountValidator();
     }
 
     public function index() {
@@ -34,22 +43,8 @@ class AdminController extends BaseController {
     }
 
     public function updateAccount() {
-        $errors = [];
-        
-        if (empty($_POST['account_id']) || !is_numeric($_POST['account_id'])) {
-            $errors[] = "Invalid account ID";
-        }
-        
-        if (empty($_POST['account_type']) || !in_array($_POST['account_type'], ['courant', 'epargne'])) {
-            $errors[] = "Invalid account type";
-        }
-        
-        if (empty($_POST['status']) || !in_array($_POST['status'], ['active', 'inactive'])) {
-            $errors[] = "Invalid status";
-        }
-        
-        if (!empty($errors)) {
-            $_SESSION['errors'] = $errors;
+        if (!$this->accountValidator->validate($_POST)) {
+            $_SESSION['errors'] = $this->accountValidator->getErrors();
             $this->accounts();
             exit;
         }
@@ -105,43 +100,13 @@ class AdminController extends BaseController {
     }
 
     public function createUser() {
-        $errors = [];
-
-        if (empty($_POST['name'])) {
-            $errors[] = "Name is required";
-        } else {
-            $name = trim($_POST['name']);
-            if (strlen($name) < 2) {
-                $errors[] = "Name must be at least 2 characters long";
-            }
-            if (preg_match('/\s{2,}/', $name)) {
-                $errors[] = "Name cannot contain multiple consecutive spaces";
-            }
-            if (!preg_match('/^[a-zA-ZÀ-ÿ\s\'-]+$/', $name)) {
-                $errors[] = "Name contains invalid characters";
-            }
-        }
-        
-        if (empty($_POST['email']) || !filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
-            $errors[] = "Invalid email address";
-        } else if ($this->usersModel->getUserByEmail($_POST['email'])) {
-            $errors[] = "This email address is already in use";
-        }
-        
-        if (!empty($_POST['profile_pic']) && !filter_var($_POST['profile_pic'], FILTER_VALIDATE_URL)) {
-            $errors[] = "Invalid profile picture URL";
-        }
-        
-        if (!empty($errors)) {
-            $_SESSION['errors'] = $errors;
+        if (!$this->userValidator->validate($_POST)) {
+            $_SESSION['errors'] = $this->userValidator->getErrors();
             $this->users();
             exit;
         }
 
-        // Generate a random password
         $password = bin2hex(random_bytes(6));
-
-        // Create the user
         $userId = $this->usersModel->createUser(
             $_POST['name'],
             $_POST['email'],
@@ -150,9 +115,7 @@ class AdminController extends BaseController {
         );
         
         if ($userId) {
-            // Create a default current account for the user
-            $accounts = new Accounts();
-            $accountResult = $accounts->createAccount($userId, 'courant', 0, 'active');
+            $accountResult = $this->accountsModel->createAccount($userId, 'courant', 0, 'active');
             
             if ($accountResult) {
                 $_SESSION['success'] = "User created successfully. Generated password: " . $password;
@@ -187,39 +150,12 @@ class AdminController extends BaseController {
     }
 
     public function updateUser() {
-        $errors = [];
-        
-        if (empty($_POST['user_id']) || !is_numeric($_POST['user_id'])) {
-            $errors[] = "Invalid user ID";
-        }
-
-        if (empty($_POST['name'])) {
-            $errors[] = "Name is required";
-        } else {
-            $name = trim($_POST['name']);
-            if (strlen($name) < 2) {
-                $errors[] = "Name must be at least 2 characters long";
-            }
-            if (!preg_match('/^[a-zA-ZÀ-ÿ\s\'-]+$/', $name)) {
-                $errors[] = "Name contains invalid characters";
-            }
-        }
-        
-        if (empty($_POST['email']) || !filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
-            $errors[] = "Invalid email address";
-        }
-        
-        if (!empty($_POST['profile_pic']) && !filter_var($_POST['profile_pic'], FILTER_VALIDATE_URL)) {
-            $errors[] = "Invalid profile picture URL";
-        }
-        
-        if (!empty($errors)) {
-            $_SESSION['errors'] = $errors;
+        if (!$this->userValidator->validate($_POST)) {
+            $_SESSION['errors'] = $this->userValidator->getErrors();
             $this->users();
             exit;
         }
 
-        
         $password = null;
         if (isset($_POST['generate_new_password']) && $_POST['generate_new_password'] === 'on') {
             $password = bin2hex(random_bytes(6));
@@ -248,25 +184,35 @@ class AdminController extends BaseController {
     }
 
     public function createAccount() {
-        if (!isset($_POST['user_id']) || !isset($_POST['account_type'])) {
-            $_SESSION['error'] = "Missing required fields";
-            header('Location: /admin/users');
+        if (!$this->accountValidator->validate($_POST)) {
+            $_SESSION['errors'] = $this->accountValidator->getErrors();
+            $this->users();
             exit;
         }
 
-        $userId = $_POST['user_id'];
-        $accountType = $_POST['account_type'];
-
-        $accounts = new Accounts();
-        $result = $accounts->createAccount($userId, $accountType, 0, 'active');
+        $result = $this->accountsModel->createAccount(
+            $_POST['user_id'],
+            $_POST['account_type'],
+            0,
+            'active'
+        );
 
         if ($result) {
             $_SESSION['success'] = "Account created successfully";
         } else {
-            $_SESSION['error'] = "Failed to create account";
+            $_SESSION['errors'] = ["Failed to create account"];
         }
 
-        header('Location: /admin/users');
+        $this->users();
+        exit;
+    }
+
+    public function searchUsers() {
+        $term = $_GET['term'] ?? '';
+        $users = $this->usersModel->searchUsers($term);
+        
+        header('Content-Type: application/json');
+        echo json_encode($users);
         exit;
     }
 

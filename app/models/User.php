@@ -107,4 +107,17 @@ class User extends Db
         $stmt = $this->conn->prepare($sql);
         return $stmt->execute([$id]);
     }
+
+    public function searchUsers($term) {
+        $term = "%$term%";
+        $sql = "SELECT id, name, email, profile_pic, created_at 
+                FROM users 
+                WHERE id != 1 
+                AND (name LIKE ? OR email LIKE ?)
+                ORDER BY created_at DESC";
+                
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([$term, $term]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

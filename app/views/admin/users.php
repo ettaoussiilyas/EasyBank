@@ -23,14 +23,13 @@ require_once(__DIR__ . '/../partials/sidebar.php');
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-bold text-gray-800">User Management</h2>
             <input type="text"
+                id="searchInput"
                 placeholder="Search by name or email..."
                 class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-violet-500">
             <button class="bg-violet-600 text-white px-4 py-2 rounded hover:bg-violet-700">
                 + New User
             </button> 
         </div>
-
-       
 
         <div class="bg-white rounded-lg shadow overflow-hidden">
             <table class="min-w-full divide-y divide-gray-200">
@@ -42,7 +41,7 @@ require_once(__DIR__ . '/../partials/sidebar.php');
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
+                <tbody class="bg-white divide-y divide-gray-200" id="usersTableBody">
                     <?php foreach ($users as $user) : ?>
                         <tr>
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -338,6 +337,87 @@ require_once(__DIR__ . '/../partials/sidebar.php');
             const userId = new URLSearchParams(this.href.split('?')[1]).get('user_id');
             showCreateAccountModal(userId);
         };
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const tbody = document.getElementById('usersTableBody');
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const day = date.getDate().toString().padStart(2, '0');
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const month = months[date.getMonth()];
+            const year = date.getFullYear();
+            return `${day} ${month} ${year}`;
+        }
+
+        function filterUsers() {
+            const searchTerm = searchInput.value;
+
+            fetch(`/admin/users/search?term=${encodeURIComponent(searchTerm)}`)
+                .then(response => response.json())
+                .then(users => {
+                    tbody.innerHTML = users.length ? users.map(user => `
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <img class="h-10 w-10 rounded-full object-cover"
+                                        src="${user.profile_pic || 'https://randomuser.me/api/portraits/lego/1.jpg'}"
+                                        alt="User photo">
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">${user.name}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">${user.email}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                ${formatDate(user.created_at)}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex items-center gap-3">
+                                <button class="p-1.5 rounded-lg hover:bg-violet-50 edit-user-btn"
+                                        onclick="showUpdateUserModal(
+                                            ${user.id}, 
+                                            '${user.name}', 
+                                            '${user.email}', 
+                                            '${user.profile_pic || ''}'
+                                        )">
+                                    <svg class="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                    </svg>
+                                </button>
+
+                                <form method="POST" 
+                                      action="/admin/users/delete" 
+                                      class="inline mb-0"
+                                      onsubmit="return confirm('Are you sure you want to delete this user? All associated accounts will also be deleted.');">
+                                    <input type="hidden" name="user_id" value="${user.id}">
+                                    <button type="submit" class="p-1.5 rounded-lg hover:bg-red-50">
+                                        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </form>
+
+                                <a href="/admin/accounts/create?user_id=${user.id}"
+                                    class="p-1.5 rounded-lg hover:bg-green-50 flex items-center gap-1">
+                                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                    </svg>
+                                    <span class="text-green-600">Add Account</span>
+                                </a>
+                            </td>
+                        </tr>
+                    `).join('') : '<tr><td colspan="4" class="px-6 py-4 text-center">No users found</td></tr>';
+                });
+        }
+
+        searchInput.addEventListener('input', filterUsers);
     });
 </script>
 

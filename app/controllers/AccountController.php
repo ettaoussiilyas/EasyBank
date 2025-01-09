@@ -15,20 +15,20 @@
             $this->userModel = new User();
         }
 
-        public function makeWithdrawal(){
-            $id = $_POST['id'];
-            $amount = $_POST['amount'];
-            try {
+        // public function makeWithdrawal(){
+        //     $id = $_POST['id'];
+        //     $amount = $_POST['amount'];
+        //     try {
 
-                $result = $bankAccount->makeWithdrawal($id, $amount);
+        //         $result = $bankAccount->makeWithdrawal($id, $amount);
 
-                if ($result['success']) {
-                    echo "Withdrawal successful. New balance: " . $result['new_balance'];
-                }
-            } catch (Exception $e) {
-                echo "Error: " . $e->getMessage();
-            }
-        }
+        //         if ($result['success']) {
+        //             echo "Withdrawal successful. New balance: " . $result['new_balance'];
+        //         }
+        //     } catch (Exception $e) {
+        //         echo "Error: " . $e->getMessage();
+        //     }
+        // }
 
         public function showAccount(){
             //get account and get user to show balnce of account ...
