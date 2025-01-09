@@ -173,15 +173,6 @@ require_once(__DIR__ . '/../partials/sidebar.php');
 <!-- Modal pour modifier un utilisateur -->
 <div id="updateUserModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-        <div class="mt-3">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-medium text-gray-900">Update User</h3>
-                <button onclick="closeUpdateUserModal()" class="text-gray-400 hover:text-gray-500">
-                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </button>
-            </div>
 
             <form id="updateUserForm" method="POST" action="/admin/users/update" class="space-y-4">
                 <input type="hidden" name="user_id" id="updateUserId">

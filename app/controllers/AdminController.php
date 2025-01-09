@@ -216,4 +216,27 @@ class AdminController extends BaseController {
         exit;
     }
 
+    public function reports() {
+        try {
+            $statistics = $this->statsModel->getReports();
+            if (!$statistics) {
+                $_SESSION['errors'] = ["Failed to load statistics"];
+            }
+            $this->renderAdmin('reports', [
+                'totaldeposit' => $statistics['totaldeposit'],
+                'totalwithdrawal' => $statistics['totalwithdrawal'],
+                'totalBalance' => $statistics['totalBalance'],
+                'monthlyStats' => $statistics['monthlyStats']
+            ]);
+        } catch (Exception $e) {
+            $_SESSION['errors'] = ["An error occurred while loading the reports"];
+            $this->renderAdmin('reports', [
+                'totaldeposit' => 0,
+                'totalwithdrawal' => 0,
+                'totalBalance' => 0,
+                'monthlyStats' => []
+            ]);
+        }
+    }
+
 }
