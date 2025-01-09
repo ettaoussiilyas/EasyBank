@@ -106,28 +106,26 @@ class AdminController extends BaseController {
 
     public function createUser() {
         $errors = [];
-        
+
         if (empty($_POST['name'])) {
             $errors[] = "Name is required";
         } else {
             $name = trim($_POST['name']);
-            
             if (strlen($name) < 2) {
                 $errors[] = "Name must be at least 2 characters long";
             }
-            
-            
-            
-
+            if (preg_match('/\s{2,}/', $name)) {
+                $errors[] = "Name cannot contain multiple consecutive spaces";
+            }
             if (!preg_match('/^[a-zA-ZÀ-ÿ\s\'-]+$/', $name)) {
                 $errors[] = "Name contains invalid characters";
             }
-            
-            $_POST['name'] = $name;
         }
         
         if (empty($_POST['email']) || !filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
             $errors[] = "Invalid email address";
+        } else if ($this->usersModel->getUserByEmail($_POST['email'])) {
+            $errors[] = "This email address is already in use";
         }
         
         if (!empty($_POST['profile_pic']) && !filter_var($_POST['profile_pic'], FILTER_VALIDATE_URL)) {
@@ -139,17 +137,30 @@ class AdminController extends BaseController {
             $this->users();
             exit;
         }
-        
-        $result = $this->usersModel->createUser(
+
+        // Generate a random password
+        $password = bin2hex(random_bytes(6));
+
+        // Create the user
+        $userId = $this->usersModel->createUser(
             $_POST['name'],
             $_POST['email'],
+            $password,
             $_POST['profile_pic'] ?? null
         );
         
-        if ($result['success']) {
-            $_SESSION['success'] = "User created successfully. Generated password: " . $result['password'];
+        if ($userId) {
+            // Create a default current account for the user
+            $accounts = new Accounts();
+            $accountResult = $accounts->createAccount($userId, 'courant', 0, 'active');
+            
+            if ($accountResult) {
+                $_SESSION['success'] = "User created successfully. Generated password: " . $password;
+            } else {
+                $_SESSION['success'] = "User created but failed to create default account. Generated password: " . $password;
+            }
         } else {
-            $_SESSION['errors'] = ["Failed to create user"];
+            $_SESSION['errors'] = ["An error occurred while creating the user"];
         }
         
         $this->users();
@@ -233,6 +244,29 @@ class AdminController extends BaseController {
         }
         
         $this->users();
+        exit;
+    }
+
+    public function createAccount() {
+        if (!isset($_POST['user_id']) || !isset($_POST['account_type'])) {
+            $_SESSION['error'] = "Missing required fields";
+            header('Location: /admin/users');
+            exit;
+        }
+
+        $userId = $_POST['user_id'];
+        $accountType = $_POST['account_type'];
+
+        $accounts = new Accounts();
+        $result = $accounts->createAccount($userId, $accountType, 0, 'active');
+
+        if ($result) {
+            $_SESSION['success'] = "Account created successfully";
+        } else {
+            $_SESSION['error'] = "Failed to create account";
+        }
+
+        header('Location: /admin/users');
         exit;
     }
 

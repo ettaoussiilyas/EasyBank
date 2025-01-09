@@ -245,6 +245,46 @@ require_once(__DIR__ . '/../partials/sidebar.php');
     </div>
 </div>
 
+<!-- Modal pour créer un compte -->
+<div id="createAccountModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Create New Account</h3>
+                <button onclick="closeCreateAccountModal()" class="text-gray-400 hover:text-gray-500">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <form method="POST" action="/admin/accounts/create" class="space-y-4">
+                <input type="hidden" id="accountUserId" name="user_id">
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Account Type</label>
+                    <select name="account_type" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500">
+                        <option value="courant">Courant</option>
+                        <option value="epargne">Épargne</option>
+                    </select>
+                </div>
+
+                <div class="flex justify-end gap-3">
+                    <button type="button"
+                            onclick="closeCreateAccountModal()"
+                            class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                            class="px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700">
+                        Create Account
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
     function showUpdateUserModal(userId, name, email, profilePic) {
         document.getElementById('updateUserId').value = userId;
@@ -267,7 +307,7 @@ require_once(__DIR__ . '/../partials/sidebar.php');
         document.getElementById('createUserModal').classList.add('hidden');
     }
 
-    // Fermer les modales en cliquant en dehors
+    
     window.onclick = function(event) {
         const updateModal = document.getElementById('updateUserModal');
         const createModal = document.getElementById('createUserModal');
@@ -279,8 +319,26 @@ require_once(__DIR__ . '/../partials/sidebar.php');
         }
     }
 
-    // Bouton pour ouvrir le modal de création
+    
     document.querySelector('button.bg-violet-600').onclick = showCreateUserModal;
+
+    function showCreateAccountModal(userId) {
+        document.getElementById('accountUserId').value = userId;
+        document.getElementById('createAccountModal').classList.remove('hidden');
+    }
+
+    function closeCreateAccountModal() {
+        document.getElementById('createAccountModal').classList.add('hidden');
+    }
+
+    // Mettre à jour le lien "Add Account" pour utiliser le modal
+    document.querySelectorAll('a[href^="/admin/accounts/create"]').forEach(link => {
+        link.onclick = function(e) {
+            e.preventDefault();
+            const userId = new URLSearchParams(this.href.split('?')[1]).get('user_id');
+            showCreateAccountModal(userId);
+        };
+    });
 </script>
 
 <?php require_once(__DIR__ . '/../partials/footer.php'); ?>

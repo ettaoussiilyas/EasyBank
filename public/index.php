@@ -41,6 +41,7 @@
     $route::get('/admin/users', [AdminController::class, 'users']);
     $route::post('/admin/users/update', [AdminController::class, 'updateUser']);
     $route::post('/admin/users/delete', [AdminController::class, 'deleteUser']);
+    $route::post('/admin/accounts/create', [AdminController::class, 'createAccount']);
 
     //user Routers
     Route::get('/user/profile', [UserController::class, 'profile']);

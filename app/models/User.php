@@ -57,24 +57,26 @@ class User extends Db
         return $stmt->fetchAll();
     }
 
-    public function createUser($name, $email, $profile_pic = null)
+    public function createUser($name, $email, $password, $profile_pic = null)
     {
+        try {
+            $sql = "INSERT INTO users (name, email, password, profile_pic, created_at) VALUES (?, ?, ?, ?, NOW())";
+            $stmt = $this->conn->prepare($sql);
+            $result = $stmt->execute([
+                $name,
+                $email,
+                password_hash($password, PASSWORD_DEFAULT),
+                $profile_pic
+            ]);
 
-        $password = bin2hex(random_bytes(6));
-
-        $sql = "INSERT INTO users (name, email, password, profile_pic) VALUES (?, ?, ?, ?)";
-        $stmt = $this->conn->prepare($sql);
-        $result = $stmt->execute([
-            $name,
-            $email,
-            password_hash($password, PASSWORD_DEFAULT),
-            $profile_pic
-        ]);
-
-        return [
-            'success' => $result,
-            'password' => $password
-        ];
+            if ($result) {
+                return $this->conn->lastInsertId();
+            }
+            return false;
+        } catch (PDOException $e) {
+            error_log("Error creating user: " . $e->getMessage());
+            return false;
+        }
     }
 
     public function updateUsers($id, $name, $email, $password = null, $profile_pic = null) {

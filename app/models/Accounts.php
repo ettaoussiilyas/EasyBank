@@ -163,5 +163,24 @@ class Accounts extends Db {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function createAccount($userId, $accountType, $initialBalance, $status) {
+        try {
+            $sql = "INSERT INTO accounts (user_id, account_type, balance, status, created_at) 
+                    VALUES (?, ?, ?, ?, NOW())";
+            
+            $stmt = $this->conn->prepare($sql);
+            $params = [
+                $userId,
+                $accountType,
+                $initialBalance,
+                $status
+            ];
+            
+            return $stmt->execute($params);
+        } catch (PDOException $e) {
+            error_log("Error creating account: " . $e->getMessage());
+            return false;
+        }
+    }
 
 }
