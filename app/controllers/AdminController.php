@@ -1,10 +1,12 @@
 <?php
-require_once(__DIR__ . '/../models/Statistics.php');
-require_once(__DIR__ . '/../models/Accounts.php');
-require_once(__DIR__ . '/../models/User.php');
-require_once(__DIR__ . '/../models/email.php');
+// require_once(__DIR__ . '/../models/Statistics.php');
+// require_once(__DIR__ . '/../models/Accounts.php');
+// require_once(__DIR__ . '/../models/User.php');
+// require_once(__DIR__ . '/../models/email.php');
 require_once(__DIR__ . '/../validators/UserValidator.php');
 require_once(__DIR__ . '/../validators/AccountValidator.php');
+require_once '../app/includes/autoloaderControllers.php';
+
 
 class AdminController extends BaseController
 {

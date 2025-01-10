@@ -206,12 +206,17 @@ class Accounts extends Db
 
             if ($account['account_type'] === 'epargne') {
                 // L9a compte courant dial nefs user
-                $stmt = $this->conn->prepare("SELECT id FROM accounts WHERE user_id = ? AND account_type = 'courant' LIMIT 1");
+                $stmt = $this->conn->prepare("SELECT id, status FROM accounts WHERE user_id = ? AND account_type = 'courant' LIMIT 1");
                 $stmt->execute([$account['user_id']]);
                 $currentAccount = $stmt->fetch(PDO::FETCH_ASSOC);
 
                 if (!$currentAccount) {
-                    throw new Exception("Khassek dir compte courant 9bel ma tqed tkhrej flous men compte épargne");
+                    throw new Exception("Khassek dir compte courant 9bel ma tqed tkhrej flus men compte épargne");
+                }
+
+                // Check if current account is active
+                if ($currentAccount['status'] === 'inactive') {
+                    throw new Exception("Le compte courant est inactif. Les retraits ne sont pas autorisés.");
                 }
 
                 // N9es men compte épargne
@@ -254,26 +259,24 @@ class Accounts extends Db
     {
         try {
             $this->conn->beginTransaction();
-
-            // Get account details
-            $account = $this->getAccountById($account_id);
-            if (!$account) {
-                throw new Exception("Account not found");
-            }
+            
+            // Get account type
+            $stmt = $this->conn->prepare("SELECT * FROM accounts WHERE id = ?");
+            $stmt->execute([$account_id]);
+            $account = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($account['account_type'] === 'epargne') {
-                // L9a compte courant dial nefs user
-                $stmt = $this->conn->prepare("SELECT id, balance FROM accounts WHERE user_id = ? AND account_type = 'courant' LIMIT 1");
-                $stmt->execute([$account['user_id']]);
+                // Check current account status first
+                $stmt = $this->conn->prepare("SELECT id, balance, status FROM accounts WHERE user_id = ? AND account_type = 'courant' LIMIT 1");
+                $stmt->execute([$user_id]);
                 $currentAccount = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                if (!$currentAccount) {
-                    throw new Exception("Khassek dir compte courant 9bel ma tqed tzid flous f compte épargne");
+                if ($currentAccount['status'] === 'inactive') {
+                    throw new Exception("Le compte courant est inactif. Les dépôts vers le compte épargne ne sont pas autorisés.");
                 }
 
-                // Check sufficient balance f compte courant
                 if ($currentAccount['balance'] < $amount) {
-                    throw new Exception("Ma3endekch flus kafyin f compte courant");
+                    throw new Exception("Solde insuffisant dans le compte courant.");
                 }
 
                 // N9es men compte courant
@@ -311,4 +314,12 @@ class Accounts extends Db
             throw $e;
         }
     }
+
+    //function to check account status
+    public function checkAccountStatus($id){
+        $stmt = $this->conn->prepare("SELECT status FROM accounts WHERE id =?");
+        $stmt->execute([$id]);
+        return $stmt->fetch()['status'];
+    }
 }
+

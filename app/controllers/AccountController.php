@@ -1,7 +1,6 @@
 <?php
 
-require_once '../app/models/Accounts.php';
-require_once '../app/models/User.php';
+require_once '../app/includes/autoloaderControllers.php';
 
 
 class AccountController extends BaseController
@@ -15,22 +14,21 @@ class AccountController extends BaseController
     {
         $this->accountModel = new Accounts();
         $this->userModel = new User();
+
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: /login');
+            exit;
+        }
+    
+        $user = $this->userModel->getUserById($_SESSION['user_id']);
+        if (!$user || $user['role'] !== 'user') {
+            header('Location: /login');
+            exit;
+        }
+
+
     }
 
-    // public function makeWithdrawal(){
-    //     $id = $_POST['id'];
-    //     $amount = $_POST['amount'];
-    //     try {
-
-    //         $result = $bankAccount->makeWithdrawal($id, $amount);
-
-    //         if ($result['success']) {
-    //             echo "Withdrawal successful. New balance: " . $result['new_balance'];
-    //         }
-    //     } catch (Exception $e) {
-    //         echo "Error: " . $e->getMessage();
-    //     }
-    // }
     public function withdrawChecker()
     {
         if (!isset($_POST['amount']) || !isset($_POST['id_account'])) {
@@ -47,6 +45,16 @@ class AccountController extends BaseController
 
         if (!$account || $account['user_id'] != $user_id) {
             header('Location: /user/account');
+            return;
+        }
+
+        // Check account status
+        $status = $this->accountModel->checkAccountStatus($account_id);
+        if ($status === 'inactive') {
+            $this->renderClient('withdraw', [
+                'account' => $account,
+                'error' => 'Ce compte est bloqué. Les retraits ne sont pas autorisés.'
+            ]);
             return;
         }
 
@@ -70,14 +78,21 @@ class AccountController extends BaseController
         $description = isset($_POST['description']) ? $_POST['description'] : '';
 
         // Perform withdrawal
-        $success = $this->accountModel->withdraw($account_id, $amount, $description, $user_id);
+        try {
+            $success = $this->accountModel->withdraw($account_id, $amount, $description, $user_id);
 
-        if ($success) {
-            header('Location: /user/account?success=withdrawal');
-        } else {
+            if ($success) {
+                header('Location: /user/account?success=withdrawal');
+            } else {
+                $this->renderClient('withdraw', [
+                    'account' => $account,
+                    'error' => 'Une erreur est survenue lors du retrait'
+                ]);
+            }
+        } catch (Exception $e) {
             $this->renderClient('withdraw', [
                 'account' => $account,
-                'error' => 'Une erreur est survenue lors du retrait'
+                'error' => $e->getMessage()
             ]);
         }
     }
@@ -85,6 +100,12 @@ class AccountController extends BaseController
     public function showAccount()
     {
         //get account and get user to show balnce of account ...
+
+        // $user = $this->userModel->getUserById($_SESSION['user_id']);
+        // if (!$user || $user['role'] !== 'user') {
+        //     header('Location: /login');
+        //     exit;
+        // }
         $id = $_SESSION['user_id'];
         $accounts = $this->accountModel->getAccountsById($id);
         $user = $this->userModel->getUserById($id);
@@ -92,6 +113,7 @@ class AccountController extends BaseController
             'user' => $user,
             'accounts' => $accounts
         ]);
+
     }
 
     public function showWithdraw()
@@ -122,8 +144,10 @@ class AccountController extends BaseController
     {
         $user_id = $_SESSION['user_id'];
         $accounts = $this->accountModel->getAccountsById($user_id);
+        
         $this->renderClient('deposit', [
-            'accounts' => $accounts
+            'accounts' => $accounts,
+            'error' => isset($_GET['error']) ? $_GET['error'] : null
         ]);
     }
 
@@ -146,21 +170,38 @@ class AccountController extends BaseController
             return;
         }
 
+        // Check account status
+        $status = $this->accountModel->checkAccountStatus($account_id);
+        if ($status === 'inactive') {
+            $this->renderClient('deposit', [
+                'accounts' => $this->accountModel->getAccountsById($user_id),
+                'error' => 'Ce compte est bloqué. Les dépôts ne sont pas autorisés.'
+            ]);
+            return;
+        }
+
         // Validation checks
         if ($amount <= 0) {
             $this->renderClient('deposit', [
-                'account' => $account,
+                'accounts' => $this->accountModel->getAccountsById($user_id),
                 'error' => 'Le montant doit être supérieur à 0'
             ]);
             return;
         }
 
         try {
-            $this->accountModel->deposit($account_id, $amount, '', $user_id);
-            header('Location: /user/account?success=deposit');
+            $success = $this->accountModel->deposit($account_id, $amount, '', $user_id);
+            if ($success) {
+                header('Location: /user/account?success=deposit');
+            } else {
+                $this->renderClient('deposit', [
+                    'accounts' => $this->accountModel->getAccountsById($user_id),
+                    'error' => 'Une erreur est survenue lors du dépôt'
+                ]);
+            }
         } catch (Exception $e) {
             $this->renderClient('deposit', [
-                'account' => $account,
+                'accounts' => $this->accountModel->getAccountsById($user_id),
                 'error' => $e->getMessage()
             ]);
         }

@@ -15,7 +15,7 @@
                 <h1 class="text-xl font-bold">EasyBank ADMIN</h1>
                 <h3 class="text-xl font-bold">Welcome <?= $_SESSION['user_name'] ?></h3>
                 <div class="space-x-4">
-                    <a href="/admin/reports" class="hover:text-violet-200">Logout</a>
+                    <a href="/logout" class="hover:text-violet-200">Logout</a>
                 </div>
             </div>
         </div>
