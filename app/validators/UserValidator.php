@@ -1,39 +1,33 @@
 <?php
+require_once(__DIR__ . '/../controllers/AbstractValidator.php');
 
-class UserValidator {
-    private $errors = [];
-
+class UserValidator extends AbstractValidator {
     public function validate($data) {
-        $this->errors = [];
-
         // Validate name
-        if (empty($data['name'])) {
-            $this->errors[] = "Name is required";
-        } elseif (!preg_match("/^[a-zA-Z ]*$/", $data['name'])) {
-            $this->errors[] = "Name can only contain letters and spaces";
+        if (isset($data['name'])) {
+            $this->validateRequired($data['name'], 'Name');
+            if (!preg_match("/^[a-zA-Z ]*$/", $data['name'])) {
+                $this->errors[] = "Name can only contain letters and spaces";
+            }
         }
 
         // Validate email
-        if (empty($data['email'])) {
-            $this->errors[] = "Email is required";
-        } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-            $this->errors[] = "Invalid email format";
+        if (isset($data['email'])) {
+            $this->validateRequired($data['email'], 'Email');
+            $this->validateEmail($data['email']);
         }
 
         // Validate role if present
-        if (isset($data['role']) && !in_array($data['role'], ['user', 'admin'])) {
-            $this->errors[] = "Invalid role specified";
+        if (isset($data['role'])) {
+            $this->validateRequired($data['role'], 'Role');
+            $this->validateInArray($data['role'], 'Role', ['user', 'admin']);
         }
 
         // Validate profile picture URL if present
-        if (!empty($data['profile_pic']) && !filter_var($data['profile_pic'], FILTER_VALIDATE_URL)) {
-            $this->errors[] = "Invalid profile picture URL";
+        if (!empty($data['profile_pic'])) {
+            $this->validateUrl($data['profile_pic'], 'Profile picture');
         }
 
-        return empty($this->errors);
-    }
-
-    public function getErrors() {
-        return $this->errors;
+        return !$this->hasErrors();
     }
 } 

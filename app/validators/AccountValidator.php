@@ -2,6 +2,7 @@
 require_once(__DIR__ . '/../controllers/AbstractValidator.php');
 
 class AccountValidator extends AbstractValidator {
+    
     public function validate($data) {
 
         if (isset($data['account_id'])) {
@@ -26,5 +27,8 @@ class AccountValidator extends AbstractValidator {
         }
 
         return !$this->hasErrors();
+    }
+    public function getErrors() {
+        return $this->errors;
     }
 } 

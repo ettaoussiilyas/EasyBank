@@ -126,7 +126,7 @@ class AdminController extends BaseController
             exit;
         }
 
-        // Check if email already exists
+        
         $existingUser = $this->usersModel->getUserByEmail($_POST['email']);
         if ($existingUser) {
             $_SESSION['errors'] = ["This email address is already registered"];
