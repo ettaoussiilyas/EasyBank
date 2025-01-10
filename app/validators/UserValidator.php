@@ -1,31 +1,39 @@
 <?php
-require_once(__DIR__ . '/../controllers/AbstractValidator.php');
 
-class UserValidator extends AbstractValidator {
+class UserValidator {
+    private $errors = [];
+
     public function validate($data) {
-       
-        if (isset($data['user_id'])) {
-            $this->validateRequired($data['user_id'], 'User ID');
-            $this->validateNumeric($data['user_id'], 'User ID');
+        $this->errors = [];
+
+        // Validate name
+        if (empty($data['name'])) {
+            $this->errors[] = "Name is required";
+        } elseif (!preg_match("/^[a-zA-Z ]*$/", $data['name'])) {
+            $this->errors[] = "Name can only contain letters and spaces";
         }
 
-        
-        if ($this->validateRequired($data['name'] ?? '', 'Name')) {
-            $this->validateLength($data['name'], 'Name', 2, 50);
-           
-            if (!preg_match('/^[a-zA-ZÀ-ÿ\s\'-]+$/', $data['name'])) {
-                $this->errors[] = "Name contains invalid characters";
-            }
+        // Validate email
+        if (empty($data['email'])) {
+            $this->errors[] = "Email is required";
+        } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+            $this->errors[] = "Invalid email format";
         }
 
-        if ($this->validateRequired($data['email'] ?? '', 'Email')) {
-            $this->validateEmail($data['email']);
+        // Validate role if present
+        if (isset($data['role']) && !in_array($data['role'], ['user', 'admin'])) {
+            $this->errors[] = "Invalid role specified";
         }
 
-        if (!empty($data['profile_pic'])) {
-            $this->validateUrl($data['profile_pic'], 'Profile picture');
+        // Validate profile picture URL if present
+        if (!empty($data['profile_pic']) && !filter_var($data['profile_pic'], FILTER_VALIDATE_URL)) {
+            $this->errors[] = "Invalid profile picture URL";
         }
 
-        return !$this->hasErrors();
+        return empty($this->errors);
+    }
+
+    public function getErrors() {
+        return $this->errors;
     }
 } 

@@ -13,14 +13,21 @@ class AdminController extends BaseController {
     private $accountValidator;
 
     public function __construct() {
-        if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] != 1) {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: /login');
+            exit;
+        }
+
+        // Vérifier si l'utilisateur est un admin
+        $this->usersModel = new User();
+        $user = $this->usersModel->getUserById($_SESSION['user_id']);
+        if (!$user || $user['role'] !== 'admin') {
             header('Location: /login');
             exit;
         }
 
         $this->statsModel = new Statistics();
         $this->accountsModel = new Accounts();
-        $this->usersModel = new User();
         $this->userValidator = new UserValidator();
         $this->accountValidator = new AccountValidator();
     }
@@ -166,7 +173,8 @@ class AdminController extends BaseController {
             $_POST['name'],
             $_POST['email'],
             $password,
-            $_POST['profile_pic'] ?? null
+            $_POST['profile_pic'] ?? null,
+            $_POST['role'] ?? 'user'
         );
         
         if ($result) {

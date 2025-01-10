@@ -4,20 +4,6 @@ require_once(__DIR__ . '/../partials/header.php');
 require_once(__DIR__ . '/../partials/sidebar.php'); 
 ?>
 
-<?php if (isset($_SESSION['errors'])): ?>
-    <script>
-        showErrorAlert(<?= json_encode($_SESSION['errors']) ?>);
-    </script>
-    <?php unset($_SESSION['errors']); ?>
-<?php endif; ?>
-
-<?php if (isset($_SESSION['success'])): ?>
-    <script>
-        showSuccessAlert(<?= json_encode($_SESSION['success']) ?>);
-    </script>
-    <?php unset($_SESSION['success']); ?>
-<?php endif; ?>
-
 <div class="flex-1 p-8 mt-16">
     <div class="max-w-7xl mx-auto">
         <!-- Header -->

@@ -90,7 +90,7 @@ class Statistics extends Db
 
     private function getTotalClients()
     {
-        $stmt = $this->conn->query("SELECT COUNT(*) as total FROM users WHERE id != 1");
+        $stmt = $this->conn->query("SELECT COUNT(*) as total FROM users WHERE role != 'admin'");
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return $result['total'];
     }
@@ -127,7 +127,7 @@ class Statistics extends Db
             FROM transactions t
             JOIN accounts a ON t.account_id = a.id
             JOIN users u ON a.user_id = u.id
-            WHERE u.id != 1
+            WHERE u.role != 'admin'
             ORDER BY t.created_at DESC
             LIMIT 5
         ");
@@ -142,7 +142,7 @@ class Statistics extends Db
                 a.status
             FROM accounts a
             JOIN users u ON a.user_id = u.id
-            WHERE u.id != 1
+            WHERE u.role != 'admin'
             ORDER BY a.created_at DESC
             LIMIT 5
         ");

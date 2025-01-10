@@ -37,6 +37,7 @@ require_once(__DIR__ . '/../partials/sidebar.php');
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created At</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                     </tr>
@@ -57,6 +58,12 @@ require_once(__DIR__ . '/../partials/sidebar.php');
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900"><?= htmlspecialchars($user['email']) ?></div>
                             </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                    <?= $user['role'] === 'admin' ? 'bg-violet-100 text-violet-800' : 'bg-gray-100 text-gray-800' ?>">
+                                    <?= htmlspecialchars($user['role']) ?>
+                                </span>
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 <?= date('d M Y', strtotime($user['created_at'])) ?>
                             </td>
@@ -67,7 +74,8 @@ require_once(__DIR__ . '/../partials/sidebar.php');
                                             <?= $user['id'] ?>, 
                                             '<?= htmlspecialchars($user['name']) ?>', 
                                             '<?= htmlspecialchars($user['email']) ?>', 
-                                            '<?= htmlspecialchars($user['profile_pic'] ?? '') ?>'
+                                            '<?= htmlspecialchars($user['profile_pic'] ?? '') ?>',
+                                            '<?= htmlspecialchars($user['role'] ?? 'user') ?>'
                                         )">
                                     <svg class="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -139,6 +147,16 @@ require_once(__DIR__ . '/../partials/sidebar.php');
                            placeholder="john@example.com">
                 </div>
 
+                <!-- Role -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                    <select name="role" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500">
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+
                 <!-- Profile Picture URL -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Profile Picture URL</label>
@@ -173,6 +191,15 @@ require_once(__DIR__ . '/../partials/sidebar.php');
 <!-- Modal pour modifier un utilisateur -->
 <div id="updateUserModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Update User</h3>
+                <button onclick="closeUpdateUserModal()" class="text-gray-400 hover:text-gray-500">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
 
             <form id="updateUserForm" method="POST" action="/admin/users/update" class="space-y-4">
                 <input type="hidden" name="user_id" id="updateUserId">
@@ -193,6 +220,17 @@ require_once(__DIR__ . '/../partials/sidebar.php');
                            name="email" 
                            required
                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500">
+                </div>
+
+                <!-- Role -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                    <select id="updateRole"
+                            name="role" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500">
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
                 </div>
 
                 <div class="mb-4">
@@ -276,11 +314,12 @@ require_once(__DIR__ . '/../partials/sidebar.php');
 </div>
 
 <script>
-    function showUpdateUserModal(userId, name, email, profilePic) {
+    function showUpdateUserModal(userId, name, email, profilePic, role) {
         document.getElementById('updateUserId').value = userId;
         document.getElementById('updateName').value = name;
         document.getElementById('updateEmail').value = email;
         document.getElementById('updateProfilePic').value = profilePic || '';
+        document.getElementById('updateRole').value = role || 'user';
         document.getElementById('generateNewPassword').checked = false;
         document.getElementById('updateUserModal').classList.remove('hidden');
     }
@@ -364,6 +403,12 @@ require_once(__DIR__ . '/../partials/sidebar.php');
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900">${user.email}</div>
                             </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                    <?= $user['role'] === 'admin' ? 'bg-violet-100 text-violet-800' : 'bg-gray-100 text-gray-800' ?>">
+                                    <?= htmlspecialchars($user['role']) ?>
+                                </span>
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 ${formatDate(user.created_at)}
                             </td>
@@ -373,7 +418,8 @@ require_once(__DIR__ . '/../partials/sidebar.php');
                                             ${user.id}, 
                                             '${user.name}', 
                                             '${user.email}', 
-                                            '${user.profile_pic || ''}'
+                                            '${user.profile_pic || ''}',
+                                            '${user.role || 'user'}'
                                         )">
                                     <svg class="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
