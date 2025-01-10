@@ -252,6 +252,12 @@ class Accounts extends Db
 
     public function deposit($account_id, $amount, $description, $user_id)
     {
+        // Check the status of the account
+        $status = $this->checkAccountStatus($account_id);
+        if ($status === 'inactive') {
+            throw new Exception("Ce compte est inactif. Les dépôts ne sont pas autorisés.");
+        }
+        
         try {
             $this->conn->beginTransaction();
 
@@ -310,5 +316,14 @@ class Accounts extends Db
             $this->conn->rollBack();
             throw $e;
         }
+
+    }
+
+    //function to check account status
+    public function checkAccountStatus($id){
+        $stmt = $this->conn->prepare("SELECT status FROM accounts WHERE id =?");
+        $stmt->execute([$id]);
+        return $stmt->fetch()['status'];
     }
 }
+

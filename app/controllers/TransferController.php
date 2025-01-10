@@ -2,9 +2,11 @@
 
     // require_once '../core/BaseController.php';
 
-    require_once '../app/models/User.php';
-    require_once '../app/models/Accounts.php';
-    require_once '../app/models/Transfer.php';
+    // require_once '../app/models/User.php';
+    // require_once '../app/models/Accounts.php';
+    // require_once '../app/models/Transfer.php';
+    require_once '../app/includes/autoloaderControllers.php';
+
 
     class TransferController extends BaseController {
 

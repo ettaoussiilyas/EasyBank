@@ -2,7 +2,9 @@
 
     // require_once '../core/BaseController.php';
 
-    require_once '../app/models/User.php';
+    // require_once '../app/models/User.php';
+    require_once '../app/includes/autoloaderControllers.php';
+
 
     class UserController extends BaseController {
 
