@@ -24,12 +24,12 @@
             if(empty($name) || empty($email) || empty($password) || empty($picture)){
                 return $this->renderClient('profile',['emptyFieldsUpdate'=>'Please fill all fields']);
             }
-            $password = password_hash($password, DEFAULT_PASSWORD);
+            $password_hash = password_hash($password, PASSWORD_DEFAULT);
             $data = [
                 'id' => $_SESSION['user_id'],
                 'name' => $name,
                 'email' => $email,
-                'password' => $password,
+                'password' => $password_hash,
                 'picture' => $picture
             ];
             $result =  $this->userModel->updateUser($data);
@@ -79,12 +79,14 @@
                     return $this->renderClient('profile', $data);
                 }
                 
+                $password_hash = password_hash($_POST['password'], PASSWORD_DEFAULT);
+                
                 $updateData = [
                     'id' => $_SESSION['user_id'],
                     'name' => $_POST['name'],
                     'picture' => $_POST['cdn'],
                     'email' => $_POST['email'],
-                    'password' => $_POST['password']
+                    'password' => $password_hash
                 ];
 
                 $result = $this->userModel->updateUser($updateData);

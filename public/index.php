@@ -29,8 +29,7 @@
     // Créer une instance de Route
     $route = new Route();
 
-    //Auth Routes
-    // Route::get('/register', [AuthController::class, 'showRegister']);
+    //Admin Routes
     $route::get('/admin', [AdminController::class, 'index']);
     $route::get('/admin/accounts', [AdminController::class, 'accounts']);
     $route::post('/admin/accounts/update', [AdminController::class, 'updateAccount']);
@@ -47,7 +46,6 @@
 
     //user Routers
     Route::get('/user/profile', [UserController::class, 'profile']);
-    // Route::get('/user/account', [UserController::class, 'showAccount']);
     Route::post('/user/profile', [UserController::class, 'updateProfile']);
     Route::get('/user/transactions', [UserController::class, 'transactions']);
     Route::get('/user/transfer', [UserController::class, 'transfer']);
@@ -63,6 +61,8 @@
     //transfer routes
     Route::get('/user/transfer', [TransferController::class, 'showTransfer']);
    
+    //logout 
+    Route::get('/logout', [AuthController::class, 'logout']);
 
 
     $router->dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);

@@ -71,6 +71,13 @@
             $this->render('auth/login');
         }
 
+        public function logout(){
+
+            session_destroy();
+            header('Location: /home');
+            exit;
+        }
+
     }
 
 
