@@ -1,14 +1,17 @@
 <?php
 require_once(__DIR__ . '/../config/db.php');
-class Accounts extends Db {
-    
-    public function __construct() {
+class Accounts extends Db
+{
+
+    public function __construct()
+    {
         parent::__construct();
     }
 
-    public function getAllAccounts() {
-        
-            $stmt = $this->conn->query("
+    public function getAllAccounts()
+    {
+
+        $stmt = $this->conn->query("
                 SELECT 
                     accounts.*,
                     users.name as name,
@@ -21,25 +24,25 @@ class Accounts extends Db {
                 WHERE users.id != 1
                 ORDER BY accounts.created_at DESC
             ");
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function updateAccount($id, $account_type, $status) {
+    public function updateAccount($id, $account_type, $status)
+    {
         $sql = "UPDATE accounts 
                 SET 
                     account_type = ?,
                     status = ?
                 WHERE id = ?";
-        
+
         $stmt = $this->conn->prepare($sql);
-        
+
         $params = [
             $account_type,
             $status,
             $id
         ];
-        
+
         return $stmt->execute($params);
     }
     public function deleteAccount($id)
@@ -50,19 +53,21 @@ class Accounts extends Db {
         return $stmt->execute($params);
     }
 
-    public function toggleStatus($id) {
+    public function toggleStatus($id)
+    {
         $sql = "UPDATE accounts 
                 SET status = CASE 
                     WHEN status = 'active' THEN 'inactive' 
                     ELSE 'active' 
                 END 
                 WHERE id = ?";
-        
+
         $stmt = $this->conn->prepare($sql);
         return $stmt->execute([$id]);
     }
 
-    public function searchAccounts($term) {
+    public function searchAccounts($term)
+    {
         $term = "%$term%";
         $sql = "SELECT 
                     accounts.*,
@@ -81,14 +86,15 @@ class Accounts extends Db {
                     OR CAST(accounts.balance AS CHAR) LIKE ?
                 )
                 ORDER BY accounts.created_at DESC";
-                
+
         $stmt = $this->conn->prepare($sql);
         $params = [$term, $term, $term, $term, $term];
         $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function makeWithdrawal($accountId, $amount) {
+    public function makeWithdrawal($accountId, $amount)
+    {
         try {
             if (!is_numeric($accountId) || !is_numeric($amount)) {
                 throw new InvalidArgumentException("Account ID and amount must be numeric values.");
@@ -102,11 +108,11 @@ class Accounts extends Db {
             $stmt = $this->conn->prepare("CALL sp_retired_amount(?, ?)");
             $stmt->bindParam(1, $accountId, PDO::PARAM_INT);
             $stmt->bindParam(2, $amount, PDO::PARAM_STR);
-        
+
             // Execute and fetch results
             $stmt->execute();
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
             // Check if withdrawal was successful
             if ($result && isset($result['message']) && $result['message'] === 'Withdrawal successful') {
                 return [
@@ -117,7 +123,6 @@ class Accounts extends Db {
             } else {
                 throw new Exception("Withdrawal failed");
             }
-        
         } catch (PDOException $e) {
             // Handle database-specific errors
             if ($e->getCode() == '45000') {
@@ -127,7 +132,6 @@ class Accounts extends Db {
             // Log the error details for debugging
             error_log("Database error in makeWithdrawal: " . $e->getMessage());
             throw new Exception("An error occurred during the withdrawal process.");
-        
         } catch (Exception $e) {
             // Log the error details for debugging
             error_log("Error in makeWithdrawal: " . $e->getMessage());
@@ -145,15 +149,38 @@ class Accounts extends Db {
         */
     }
 
-    public function getAccountsById($id) {
+    public function getAccountsById($id)
+    {
 
         $stmt = $this->conn->prepare("SELECT * FROM accounts WHERE user_id =?");
         $stmt->bindParam(1, $id, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    public function getAccountById($id) {
 
+
+    public function createAccount($userId, $accountType, $initialBalance, $status)
+    {
+        try {
+            $sql = "INSERT INTO accounts (user_id, account_type, balance, status, created_at) 
+                    VALUES (?, ?, ?, ?, NOW())";
+
+            $stmt = $this->conn->prepare($sql);
+            $params = [
+                $userId,
+                $accountType,
+                $initialBalance,
+                $status
+            ];
+
+            return $stmt->execute($params);
+        } catch (PDOException $e) {
+            error_log("Error creating account: " . $e->getMessage());
+            return false;
+        }
+    }
+    public function getAccountById($id)
+    {
         $stmt = $this->conn->prepare("SELECT * FROM accounts WHERE id =?");
 
         $stmt->bindParam(1, $id, PDO::PARAM_INT);
@@ -161,10 +188,11 @@ class Accounts extends Db {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function withdraw($account_id, $amount, $description, $user_id) {
+    public function withdraw($account_id, $amount, $description, $user_id)
+    {
         try {
             $this->conn->beginTransaction();
-            
+
             // Get account details
             $account = $this->getAccountById($account_id);
             if (!$account) {
@@ -181,7 +209,7 @@ class Accounts extends Db {
                 $stmt = $this->conn->prepare("SELECT id FROM accounts WHERE user_id = ? AND account_type = 'courant' LIMIT 1");
                 $stmt->execute([$account['user_id']]);
                 $currentAccount = $stmt->fetch(PDO::FETCH_ASSOC);
-                
+
                 if (!$currentAccount) {
                     throw new Exception("Khassek dir compte courant 9bel ma tqed tkhrej flous men compte épargne");
                 }
@@ -201,7 +229,6 @@ class Accounts extends Db {
                         VALUES (?, 'retrait', ?, ?)";
                 $stmt = $this->conn->prepare($sql);
                 $stmt->execute([$account_id, $amount, $currentAccount['id']]);
-
             } else {
                 // Compte courant: n9es direct
                 $sql = "UPDATE accounts SET balance = balance - ? WHERE id = ?";
@@ -217,17 +244,17 @@ class Accounts extends Db {
 
             $this->conn->commit();
             return true;
-
         } catch (Exception $e) {
             $this->conn->rollBack();
             throw $e;
         }
     }
 
-    public function deposit($account_id, $amount, $description, $user_id) {
+    public function deposit($account_id, $amount, $description, $user_id)
+    {
         try {
             $this->conn->beginTransaction();
-            
+
             // Get account details
             $account = $this->getAccountById($account_id);
             if (!$account) {
@@ -239,7 +266,7 @@ class Accounts extends Db {
                 $stmt = $this->conn->prepare("SELECT id, balance FROM accounts WHERE user_id = ? AND account_type = 'courant' LIMIT 1");
                 $stmt->execute([$account['user_id']]);
                 $currentAccount = $stmt->fetch(PDO::FETCH_ASSOC);
-                
+
                 if (!$currentAccount) {
                     throw new Exception("Khassek dir compte courant 9bel ma tqed tzid flous f compte épargne");
                 }
@@ -264,7 +291,6 @@ class Accounts extends Db {
                         VALUES (?, 'transfert', ?, ?)";
                 $stmt = $this->conn->prepare($sql);
                 $stmt->execute([$currentAccount['id'], $amount, $account_id]);
-
             } else {
                 // Compte courant: zid direct
                 $sql = "UPDATE accounts SET balance = balance + ? WHERE id = ?";
@@ -280,11 +306,9 @@ class Accounts extends Db {
 
             $this->conn->commit();
             return true;
-
         } catch (Exception $e) {
             $this->conn->rollBack();
             throw $e;
         }
     }
-
 }

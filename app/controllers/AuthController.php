@@ -59,7 +59,7 @@
                 $_SESSION['status'] = $status;
 
                 $id= (int)$user['id'];
-                if($user['id']==1){
+                if($user['role'] === 'admin'){
                     header('Location: /admin');
                     exit;
                 }else{

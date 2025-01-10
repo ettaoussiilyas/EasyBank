@@ -219,7 +219,6 @@ require_once(__DIR__ . '/../partials/sidebar.php');
             fetch(`/admin/accounts/search?term=${encodeURIComponent(searchTerm)}&status=${status}`)
                 .then(response => response.json())
                 .then(accounts => {
-                    // Filtrer par balance si nécessaire
                     if (balance) {
                         const bal = parseFloat(balance);
                         accounts = accounts.filter(account => {
@@ -231,7 +230,6 @@ require_once(__DIR__ . '/../partials/sidebar.php');
                         });
                     }
 
-                    // Afficher les résultats
                     tbody.innerHTML = accounts.length ? accounts.map(account => `
                         <tr id="row-${account.id}">
                             <td class="px-6 py-4">
@@ -256,7 +254,7 @@ require_once(__DIR__ . '/../partials/sidebar.php');
                                 </form>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex items-center gap-3">
-                                <!-- Edit Icon -->
+                                
                                 <button onclick="showUpdateForm(${account.id}, '${account.account_type}', '${account.status}')" 
                                     class="p-1.5 rounded-lg hover:bg-violet-50">
                                     <svg class="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -265,7 +263,7 @@ require_once(__DIR__ . '/../partials/sidebar.php');
                                     </svg>
                                 </button>
 
-                                <!-- Delete Icon -->
+                                
                                 <form method="POST" action="/admin/accounts/delete" class="inline mb-0">
                                     <input type="hidden" name="account_id" value="${account.id}">
                                     <button type="submit" class="p-1.5 rounded-lg hover:bg-red-50">

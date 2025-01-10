@@ -37,10 +37,13 @@
     $route::post('/admin/accounts/delete', [AdminController::class, 'deleteAccount']);
     $route::post('/admin/accounts/toggle-status', [AdminController::class, 'toggleStatus']);
     $route::get('/admin/accounts/search', [AdminController::class, 'searchAccounts']);
+    $route::get('/admin/users/search', [AdminController::class, 'searchUsers']);
     $route::post('/admin/users/create', [AdminController::class, 'createUser']);
     $route::get('/admin/users', [AdminController::class, 'users']);
     $route::post('/admin/users/update', [AdminController::class, 'updateUser']);
     $route::post('/admin/users/delete', [AdminController::class, 'deleteUser']);
+    $route::post('/admin/accounts/create', [AdminController::class, 'createAccount']);
+    $route::get('/admin/reports', [AdminController::class, 'reports']);
 
     //user Routers
     Route::get('/user/profile', [UserController::class, 'profile']);

@@ -2,18 +2,34 @@
 require_once(__DIR__ . '/../models/Statistics.php');
 require_once(__DIR__ . '/../models/Accounts.php');
 require_once(__DIR__ . '/../models/User.php');
-
-
+require_once(__DIR__ . '/../validators/UserValidator.php');
+require_once(__DIR__ . '/../validators/AccountValidator.php');
 
 class AdminController extends BaseController {
     private $statsModel;
     private $accountsModel;
     private $usersModel;
+    private $userValidator;
+    private $accountValidator;
 
     public function __construct() {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: /login');
+            exit;
+        }
+
+        // Vérifier si l'utilisateur est un admin
+        $this->usersModel = new User();
+        $user = $this->usersModel->getUserById($_SESSION['user_id']);
+        if (!$user || $user['role'] !== 'admin') {
+            header('Location: /login');
+            exit;
+        }
+
         $this->statsModel = new Statistics();
         $this->accountsModel = new Accounts();
-        $this->usersModel = new User();
+        $this->userValidator = new UserValidator();
+        $this->accountValidator = new AccountValidator();
     }
 
     public function index() {
@@ -34,22 +50,8 @@ class AdminController extends BaseController {
     }
 
     public function updateAccount() {
-        $errors = [];
-        
-        if (empty($_POST['account_id']) || !is_numeric($_POST['account_id'])) {
-            $errors[] = "Invalid account ID";
-        }
-        
-        if (empty($_POST['account_type']) || !in_array($_POST['account_type'], ['courant', 'epargne'])) {
-            $errors[] = "Invalid account type";
-        }
-        
-        if (empty($_POST['status']) || !in_array($_POST['status'], ['active', 'inactive'])) {
-            $errors[] = "Invalid status";
-        }
-        
-        if (!empty($errors)) {
-            $_SESSION['errors'] = $errors;
+        if (!$this->accountValidator->validate($_POST)) {
+            $_SESSION['errors'] = $this->accountValidator->getErrors();
             $this->accounts();
             exit;
         }
@@ -105,51 +107,30 @@ class AdminController extends BaseController {
     }
 
     public function createUser() {
-        $errors = [];
-        
-        if (empty($_POST['name'])) {
-            $errors[] = "Name is required";
-        } else {
-            $name = trim($_POST['name']);
-            
-            if (strlen($name) < 2) {
-                $errors[] = "Name must be at least 2 characters long";
-            }
-            
-            
-            
-
-            if (!preg_match('/^[a-zA-ZÀ-ÿ\s\'-]+$/', $name)) {
-                $errors[] = "Name contains invalid characters";
-            }
-            
-            $_POST['name'] = $name;
-        }
-        
-        if (empty($_POST['email']) || !filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
-            $errors[] = "Invalid email address";
-        }
-        
-        if (!empty($_POST['profile_pic']) && !filter_var($_POST['profile_pic'], FILTER_VALIDATE_URL)) {
-            $errors[] = "Invalid profile picture URL";
-        }
-        
-        if (!empty($errors)) {
-            $_SESSION['errors'] = $errors;
+        if (!$this->userValidator->validate($_POST)) {
+            $_SESSION['errors'] = $this->userValidator->getErrors();
             $this->users();
             exit;
         }
-        
-        $result = $this->usersModel->createUser(
+
+        $password = bin2hex(random_bytes(6));
+        $userId = $this->usersModel->createUser(
             $_POST['name'],
             $_POST['email'],
+            $password,
             $_POST['profile_pic'] ?? null
         );
         
-        if ($result['success']) {
-            $_SESSION['success'] = "User created successfully. Generated password: " . $result['password'];
+        if ($userId) {
+            $accountResult = $this->accountsModel->createAccount($userId, 'courant', 0, 'active');
+            
+            if ($accountResult) {
+                $_SESSION['success'] = "User created successfully. Generated password: " . $password;
+            } else {
+                $_SESSION['success'] = "User created but failed to create default account. Generated password: " . $password;
+            }
         } else {
-            $_SESSION['errors'] = ["Failed to create user"];
+            $_SESSION['errors'] = ["An error occurred while creating the user"];
         }
         
         $this->users();
@@ -176,39 +157,12 @@ class AdminController extends BaseController {
     }
 
     public function updateUser() {
-        $errors = [];
-        
-        if (empty($_POST['user_id']) || !is_numeric($_POST['user_id'])) {
-            $errors[] = "Invalid user ID";
-        }
-
-        if (empty($_POST['name'])) {
-            $errors[] = "Name is required";
-        } else {
-            $name = trim($_POST['name']);
-            if (strlen($name) < 2) {
-                $errors[] = "Name must be at least 2 characters long";
-            }
-            if (!preg_match('/^[a-zA-ZÀ-ÿ\s\'-]+$/', $name)) {
-                $errors[] = "Name contains invalid characters";
-            }
-        }
-        
-        if (empty($_POST['email']) || !filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
-            $errors[] = "Invalid email address";
-        }
-        
-        if (!empty($_POST['profile_pic']) && !filter_var($_POST['profile_pic'], FILTER_VALIDATE_URL)) {
-            $errors[] = "Invalid profile picture URL";
-        }
-        
-        if (!empty($errors)) {
-            $_SESSION['errors'] = $errors;
+        if (!$this->userValidator->validate($_POST)) {
+            $_SESSION['errors'] = $this->userValidator->getErrors();
             $this->users();
             exit;
         }
 
-        
         $password = null;
         if (isset($_POST['generate_new_password']) && $_POST['generate_new_password'] === 'on') {
             $password = bin2hex(random_bytes(6));
@@ -219,7 +173,8 @@ class AdminController extends BaseController {
             $_POST['name'],
             $_POST['email'],
             $password,
-            $_POST['profile_pic'] ?? null
+            $_POST['profile_pic'] ?? null,
+            $_POST['role'] ?? 'user'
         );
         
         if ($result) {
@@ -234,6 +189,62 @@ class AdminController extends BaseController {
         
         $this->users();
         exit;
+    }
+
+    public function createAccount() {
+        if (!$this->accountValidator->validate($_POST)) {
+            $_SESSION['errors'] = $this->accountValidator->getErrors();
+            $this->users();
+            exit;
+        }
+
+        $result = $this->accountsModel->createAccount(
+            $_POST['user_id'],
+            $_POST['account_type'],
+            0,
+            'active'
+        );
+
+        if ($result) {
+            $_SESSION['success'] = "Account created successfully";
+        } else {
+            $_SESSION['errors'] = ["Failed to create account"];
+        }
+
+        $this->users();
+        exit;
+    }
+
+    public function searchUsers() {
+        $term = $_GET['term'] ?? '';
+        $users = $this->usersModel->searchUsers($term);
+        
+        header('Content-Type: application/json');
+        echo json_encode($users);
+        exit;
+    }
+
+    public function reports() {
+        try {
+            $statistics = $this->statsModel->getReports();
+            if (!$statistics) {
+                $_SESSION['errors'] = ["Failed to load statistics"];
+            }
+            $this->renderAdmin('reports', [
+                'totaldeposit' => $statistics['totaldeposit'],
+                'totalwithdrawal' => $statistics['totalwithdrawal'],
+                'totalBalance' => $statistics['totalBalance'],
+                'monthlyStats' => $statistics['monthlyStats']
+            ]);
+        } catch (Exception $e) {
+            $_SESSION['errors'] = ["An error occurred while loading the reports"];
+            $this->renderAdmin('reports', [
+                'totaldeposit' => 0,
+                'totalwithdrawal' => 0,
+                'totalBalance' => 0,
+                'monthlyStats' => []
+            ]);
+        }
     }
 
 }
