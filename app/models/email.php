@@ -33,7 +33,7 @@ class Email extends Db
             //Content
             $mail->isHTML(true);                                  // Set email format to HTML
             $mail->Subject = 'Here is Your Password';
-            $mail->Body    = 'Here is Your Password for the user' .  $password;
+            $mail->Body    = 'Here is Your Password for the user ' .  $password;
 
             $mail->send();
         } catch (Exception $e) {
